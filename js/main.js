@@ -651,28 +651,30 @@
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100); camera.position.set(0, 0, 9);
 
+    const LIGHT = document.documentElement.dataset.theme === "light";
     // studio environment built in-code (no HDR download)
     const envScene = new THREE.Scene();
-    const box = new THREE.Mesh(new THREE.BoxGeometry(20, 20, 20), new THREE.MeshBasicMaterial({ color: 0x050608, side: THREE.BackSide }));
+    const box = new THREE.Mesh(new THREE.BoxGeometry(20, 20, 20), new THREE.MeshBasicMaterial({ color: LIGHT ? 0xbdb5a6 : 0x050608, side: THREE.BackSide }));
     envScene.add(box);
     const panel = (w, h, pos, col, int) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(col).multiplyScalar(int), side: THREE.DoubleSide })); m.position.set(...pos); m.lookAt(0, 0, 0); envScene.add(m); };
     panel(10, 4, [0, 8, 2], 0xffffff, 4); panel(4, 9, [-9, 1, 3], 0xffffff, 2.2); panel(3, 8, [9, 0, -2], 0xd6b98c, 3); panel(12, 2, [0, -6, 6], 0xffffff, .8);
     const pmrem = new THREE.PMREMGenerator(renderer);
     scene.environment = pmrem.fromScene(envScene, 0.02).texture;
 
-    const LIGHT = document.documentElement.dataset.theme === "light";
     const root = new THREE.Group(); scene.add(root);
     const accent = new THREE.Color(0xd6b98c);
 
     // glass shell
     // glass shell: thin clear-coat surface + fresnel rim (cheaper and cleaner than transmission)
     const shellGeo = new THREE.SphereGeometry(1.35, mobile ? 48 : 96, mobile ? 48 : 96);
-    const shell = new THREE.Mesh(shellGeo, new THREE.MeshBasicMaterial({ color: LIGHT ? 0xffffff : 0xd6b98c, transparent: true, opacity: LIGHT ? 0.28 : 0.035, depthWrite: false }));
+    const shell = new THREE.Mesh(shellGeo, new THREE.MeshBasicMaterial({ color: LIGHT ? 0xffffff : 0xd6b98c, transparent: true, opacity: LIGHT ? 0.22 : 0.035, depthWrite: false }));
     root.add(shell);
     const rimMat = new THREE.ShaderMaterial({
       uniforms: { c: { value: new THREE.Color(LIGHT ? 0x9a7444 : 0xd6b98c) } }, transparent: true, depthWrite: false, blending: LIGHT ? THREE.NormalBlending : THREE.AdditiveBlending,
       vertexShader: "varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix*vec4(position,1.0); vN = normalize(normalMatrix*normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix*mv; }",
-      fragmentShader: "uniform vec3 c; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - abs(dot(vN, vV)), 2.6); float hi = pow(max(dot(vN, normalize(vec3(-0.5,0.7,0.5))),0.0), 40.0); gl_FragColor = vec4(c * f * 0.85 + vec3(f*f*0.4 + hi*0.6), clamp(f + hi*0.6, 0.0, 1.0)); }"
+      fragmentShader: LIGHT
+        ? "uniform vec3 c; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - abs(dot(vN, vV)), 3.0); float hi = pow(max(dot(vN, normalize(vec3(-0.5,0.7,0.5))),0.0), 30.0); vec3 col = mix(vec3(1.0), c, f*0.55); gl_FragColor = vec4(mix(col, vec3(1.0), hi), clamp(f*0.55 + hi*0.8, 0.0, 1.0)); }"
+        : "uniform vec3 c; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - abs(dot(vN, vV)), 2.6); float hi = pow(max(dot(vN, normalize(vec3(-0.5,0.7,0.5))),0.0), 40.0); gl_FragColor = vec4(c * f * 0.85 + vec3(f*f*0.4 + hi*0.6), clamp(f + hi*0.6, 0.0, 1.0)); }"
     });
     root.add(new THREE.Mesh(shellGeo, rimMat));
     // inner faceted metal core + glowing heart
@@ -684,7 +686,7 @@
     glow.scale.set(2.6, 2.6, 1); root.add(glow);
 
     // orbit rings
-    const metal = new THREE.MeshStandardMaterial({ color: 0xdfe3e8, metalness: 1, roughness: 0.18 });
+    const metal = LIGHT ? new THREE.MeshStandardMaterial({ color: 0xb9b2a5, metalness: 0.6, roughness: 0.35 }) : new THREE.MeshStandardMaterial({ color: 0xdfe3e8, metalness: 1, roughness: 0.18 });
     const rings = [[1.7, 0.01, 1.25, 0.2], [1.95, 0.005, -0.4, 0.9], [1.0, 0.007, 0.6, -0.6]].map(([r, t, rx, rz], i) => {
       const m = new THREE.Mesh(new THREE.TorusGeometry(r, t, 12, 220), i === 1 ? new THREE.MeshBasicMaterial({ color: accent, transparent: true, opacity: .55 }) : metal);
       m.rotation.set(rx, 0, rz); root.add(m); return m;
