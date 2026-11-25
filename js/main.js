@@ -10,6 +10,8 @@
   const E = window.ELAW || {};
   const SITE = E.site || {}, C = E.content || {};
   const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const THEME = document.documentElement.dataset.theme || "dark";
+  const TW = THEME === "twilight";
   const TYPES = E.projectTypes || {};
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -82,10 +84,20 @@
   /* =====================================================================
      RENDER: services, story, process, why, about
      ===================================================================== */
+  const SVC_GLYPHS = {
+    social:    ["M4 5.5h16v10.5H9.5L5.5 19.5v-3.5H4z", "M12 13.4s-3.2-1.9-3.2-4.1a1.7 1.7 0 0 1 3.2-.8 1.7 1.7 0 0 1 3.2.8c0 2.2-3.2 4.1-3.2 4.1z"],
+    ai:        ["M11 3.5l2.2 6.3 6.3 2.2-6.3 2.2L11 20.5l-2.2-6.3L2.5 12l6.3-2.2z", "M18.5 3v4M16.5 5h4"],
+    video:     ["M4 9.5h16v10H4z", "M4 9.5l1.4-4.2h14.2L18.6 9.5", "M9.6 5.3L8.2 9.5M14.6 5.3l-1.4 4.2", "M10.5 12.6v4l3.6-2z"],
+    marketing: ["M3.5 10v4h3.2l7.3 4.3V5.7L6.7 10z", "M17.2 9.2a4 4 0 0 1 0 5.6M19.6 7a7 7 0 0 1 0 10", "M7 14l1.6 4.6h2.6L9.8 14"],
+    digital:   ["M3.5 5h17v14h-17z", "M3.5 8.6h17", "M9.6 11.6L7 14.2l2.6 2.6M14.4 11.6l2.6 2.6-2.6 2.6"]
+  };
+  const svcGlyph = id => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${(SVC_GLYPHS[id] || []).map(d => `<path d="${d}"/>`).join("")}</svg>`;
+
   function renderServices() {
     const box = $("[data-services]"); if (!box) return;
     box.innerHTML = (C.services || []).map((s, i) => `
       <article class="svc__row reveal" style="--d:${i * 0.06}s" id="svc-${esc(s.id)}">
+        <div class="svc__art" data-svc="${esc(s.id)}" aria-hidden="true">${svcGlyph(s.id)}</div>
         <span class="svc__no">${esc(s.no)}</span>
         <div><h3 class="svc__title">${esc(s.title)}</h3><p class="svc__hook">${esc(s.hook)}</p></div>
         <ul class="svc__items">${s.items.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
@@ -617,12 +629,12 @@
     const bg = g.createRadialGradient(S * .38, S * .3, 10, S / 2, S / 2, r);
     bg.addColorStop(0, "rgba(58,62,70,.92)"); bg.addColorStop(.7, "rgba(16,18,22,.92)"); bg.addColorStop(1, "rgba(8,9,11,.92)");
     g.beginPath(); g.arc(S / 2, S / 2, r, 0, Math.PI * 2); g.fillStyle = bg; g.fill();
-    const rim = g.createLinearGradient(0, 0, S, S); rim.addColorStop(0, "rgba(255,255,255,.75)"); rim.addColorStop(.5, "rgba(255,255,255,.12)"); rim.addColorStop(1, "rgba(214,185,140,.8)");
+    const rim = g.createLinearGradient(0, 0, S, S); rim.addColorStop(0, "rgba(255,255,255,.75)"); rim.addColorStop(.5, "rgba(255,255,255,.12)"); rim.addColorStop(1, TW ? "rgba(196,150,255,.9)" : "rgba(214,185,140,.8)");
     g.lineWidth = 5; g.strokeStyle = rim; g.stroke();
     const ic = CORE_ICONS[name];
     if (ic) {
       g.save(); const k = 5.4; g.translate(S / 2 - 12 * k, S / 2 - 12 * k); g.scale(k, k);
-      const ink = g.createLinearGradient(0, 3, 0, 21); ink.addColorStop(0, "#ffffff"); ink.addColorStop(.55, "#d6dae0"); ink.addColorStop(1, "#e6cfa6");
+      const ink = g.createLinearGradient(0, 3, 0, 21); ink.addColorStop(0, "#ffffff"); ink.addColorStop(.55, "#d6dae0"); ink.addColorStop(1, TW ? "#f3b8ff" : "#e6cfa6");
       g.strokeStyle = ink; g.fillStyle = ink; g.lineWidth = 1.55; g.lineCap = "round"; g.lineJoin = "round";
       ic.d.forEach(d => g.stroke(new Path2D(d))); (ic.fill || []).forEach(d => g.fill(new Path2D(d)));
       g.restore();
@@ -654,23 +666,24 @@
     const LIGHT = document.documentElement.dataset.theme === "light";
     // studio environment built in-code (no HDR download)
     const envScene = new THREE.Scene();
-    const box = new THREE.Mesh(new THREE.BoxGeometry(20, 20, 20), new THREE.MeshBasicMaterial({ color: LIGHT ? 0xbdb5a6 : 0x050608, side: THREE.BackSide }));
+    const box = new THREE.Mesh(new THREE.BoxGeometry(20, 20, 20), new THREE.MeshBasicMaterial({ color: LIGHT ? 0xbdb5a6 : TW ? 0x150e30 : 0x050608, side: THREE.BackSide }));
     envScene.add(box);
     const panel = (w, h, pos, col, int) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(col).multiplyScalar(int), side: THREE.DoubleSide })); m.position.set(...pos); m.lookAt(0, 0, 0); envScene.add(m); };
-    panel(10, 4, [0, 8, 2], 0xffffff, 4); panel(4, 9, [-9, 1, 3], 0xffffff, 2.2); panel(3, 8, [9, 0, -2], 0xd6b98c, 3); panel(12, 2, [0, -6, 6], 0xffffff, .8);
+    if (TW) { panel(10, 4, [0, 8, 2], 0xffffff, 3.5); panel(4, 9, [-9, 1, 3], 0x9b6bff, 3); panel(3, 8, [9, 0, -2], 0xffa27a, 3); panel(12, 2, [0, -6, 6], 0x5b3bd6, 1.2); }
+    else { panel(10, 4, [0, 8, 2], 0xffffff, 4); panel(4, 9, [-9, 1, 3], 0xffffff, 2.2); panel(3, 8, [9, 0, -2], 0xd6b98c, 3); panel(12, 2, [0, -6, 6], 0xffffff, .8); }
     const pmrem = new THREE.PMREMGenerator(renderer);
     scene.environment = pmrem.fromScene(envScene, 0.02).texture;
 
     const root = new THREE.Group(); scene.add(root);
-    const accent = new THREE.Color(0xd6b98c);
+    const accent = new THREE.Color(TW ? 0xb48cff : 0xd6b98c);
 
     // glass shell
     // glass shell: thin clear-coat surface + fresnel rim (cheaper and cleaner than transmission)
     const shellGeo = new THREE.SphereGeometry(1.35, mobile ? 48 : 96, mobile ? 48 : 96);
-    const shell = new THREE.Mesh(shellGeo, new THREE.MeshBasicMaterial({ color: LIGHT ? 0xffffff : 0xd6b98c, transparent: true, opacity: LIGHT ? 0.22 : 0.035, depthWrite: false }));
+    const shell = new THREE.Mesh(shellGeo, new THREE.MeshBasicMaterial({ color: LIGHT ? 0xffffff : TW ? 0xb48cff : 0xd6b98c, transparent: true, opacity: LIGHT ? 0.22 : TW ? 0.05 : 0.035, depthWrite: false }));
     root.add(shell);
     const rimMat = new THREE.ShaderMaterial({
-      uniforms: { c: { value: new THREE.Color(LIGHT ? 0x9a7444 : 0xd6b98c) } }, transparent: true, depthWrite: false, blending: LIGHT ? THREE.NormalBlending : THREE.AdditiveBlending,
+      uniforms: { c: { value: new THREE.Color(LIGHT ? 0x9a7444 : TW ? 0xc4a0ff : 0xd6b98c) } }, transparent: true, depthWrite: false, blending: LIGHT ? THREE.NormalBlending : THREE.AdditiveBlending,
       vertexShader: "varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix*vec4(position,1.0); vN = normalize(normalMatrix*normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix*mv; }",
       fragmentShader: LIGHT
         ? "uniform vec3 c; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - abs(dot(vN, vV)), 3.0); float hi = pow(max(dot(vN, normalize(vec3(-0.5,0.7,0.5))),0.0), 30.0); vec3 col = mix(vec3(1.0), c, f*0.55); gl_FragColor = vec4(mix(col, vec3(1.0), hi), clamp(f*0.55 + hi*0.8, 0.0, 1.0)); }"
@@ -678,7 +691,7 @@
     });
     root.add(new THREE.Mesh(shellGeo, rimMat));
     // inner faceted metal core + glowing heart
-    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 1), new THREE.MeshStandardMaterial({ color: 0xc9d1da, metalness: 0.85, roughness: 0.3, flatShading: true, envMapIntensity: 1.6, emissive: 0x0d3a42, emissiveIntensity: 0.6 }));
+    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 1), new THREE.MeshStandardMaterial({ color: 0xc9d1da, metalness: 0.85, roughness: 0.3, flatShading: true, envMapIntensity: 1.6, emissive: TW ? 0x2a1660 : 0x0d3a42, emissiveIntensity: 0.6 }));
     root.add(core);
     const heart = new THREE.Mesh(new THREE.SphereGeometry(0.16, 32, 32), new THREE.MeshBasicMaterial({ color: accent }));
     root.add(heart);
@@ -712,8 +725,24 @@
     const N = mobile ? 260 : 600, pos = new Float32Array(N * 3);
     for (let i = 0; i < N; i++) { const r = 2.4 + Math.random() * 3.5, t = Math.random() * Math.PI * 2, p = Math.acos(2 * Math.random() - 1); pos.set([r * Math.sin(p) * Math.cos(t), r * Math.cos(p) * .6, r * Math.sin(p) * Math.sin(t)], i * 3); }
     const dustG = new THREE.BufferGeometry(); dustG.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    const dust = new THREE.Points(dustG, new THREE.PointsMaterial({ size: 0.018, color: LIGHT ? 0x9a7444 : 0xe8dfcf, transparent: true, opacity: LIGHT ? .35 : .55, depthWrite: false }));
+    const dust = new THREE.Points(dustG, new THREE.PointsMaterial({ size: 0.018, color: LIGHT ? 0x9a7444 : TW ? 0xe9dcff : 0xe8dfcf, transparent: true, opacity: LIGHT ? .35 : .55, depthWrite: false }));
     root.add(dust);
+
+    // floating glass cubes (twilight theme)
+    const cubes = [];
+    if (TW) {
+      const cols = [0x8b5cf6, 0x22d3ee, 0xffb547, 0xf472b6, 0xa78bfa, 0x38bdf8];
+      const spots = [[-2.1, 1.25, 0.6, .42], [1.95, 1.55, -0.4, .34], [2.25, -1.3, 0.5, .3], [-1.8, -1.45, -0.3, .26], [-0.6, 2.05, -0.8, .22], [0.7, -2.05, 0.2, .2]];
+      spots.slice(0, mobile ? 4 : 6).forEach(([x, y, z, s], i) => {
+        const g = new THREE.Group();
+        const geo = new THREE.BoxGeometry(s, s, s);
+        const glass = new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({ color: cols[i], metalness: 0.1, roughness: 0.06, clearcoat: 1, clearcoatRoughness: 0.05, iridescence: 1, iridescenceIOR: 1.35, envMapIntensity: 2.2, transparent: true, opacity: 0.62, emissive: cols[i], emissiveIntensity: 0.18 }));
+        const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.75 }));
+        const inner = new THREE.Mesh(new THREE.BoxGeometry(s * .42, s * .42, s * .42), new THREE.MeshBasicMaterial({ color: cols[i] }));
+        g.add(glass, edges, inner); g.userData = { base: new THREE.Vector3(x, y, z), ph: i * 1.3, sp: 0.25 + (i % 3) * 0.12 };
+        g.rotation.set(Math.random() * 3, Math.random() * 3, 0); scene.add(g); cubes.push(g);
+      });
+    }
 
     const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(3, 5, 4); scene.add(key);
     const rim = new THREE.PointLight(accent, 6, 10); rim.position.set(-2.5, -1, 2); scene.add(rim);
@@ -750,6 +779,12 @@
       glow.material.opacity = 0.45 + Math.sin(t * 2) * 0.1;
       rings[0].rotation.z += 0.0018; rings[1].rotation.y += 0.001; rings[2].rotation.x -= 0.003;
       dust.rotation.y = -t * 0.02;
+      cubes.forEach(c => {
+        const u = c.userData;
+        c.position.set(root.position.x + u.base.x * s, root.position.y + u.base.y * s + Math.sin(t * u.sp + u.ph) * 0.12, u.base.z);
+        c.rotation.x += 0.004 * (1 + u.sp); c.rotation.y += 0.006 * (1 + u.sp);
+        c.scale.setScalar(1 - scrollP * 0.3);
+      });
       sats.forEach(o => {
         o.pivot.rotation.y += o.speed * 0.01 * (1 + scrollP * 2);
         o.m.material.rotation = Math.sin(t * o.spin) * 0.25;
