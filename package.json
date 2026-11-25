@@ -1,0 +1,10 @@
+{
+  "name": "elaw-studios",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ELAW STUDIOS — AI Creative & Digital Marketing Studio website (static, no build step)",
+  "scripts": {
+    "dev": "npx --yes serve -l 5173 .",
+    "check": "node scripts/check.mjs"
+  }
+}

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ELAW STUDIOS — AI Creative &amp; Digital Marketing Studio</title>
+  <meta name="description" content="ELAW STUDIOS creates AI-powered content, reels, video, 3D visuals, social campaigns and digital experiences for modern brands.">
+  <meta name="theme-color" content="#07080a">
+  <meta name="color-scheme" content="dark">
+  <!-- Live domain (Hostinger subdomain) -->
+  <link rel="canonical" href="https://studio.elawmaran.tech/">
+
+  <!-- Open Graph / social preview -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ELAW STUDIOS">
+  <meta property="og:title" content="ELAW STUDIOS — AI Creative &amp; Digital Marketing Studio">
+  <meta property="og:description" content="AI-powered content, reels, films, 3D and digital experiences for modern brands.">
+  <meta property="og:url" content="https://studio.elawmaran.tech/">
+  <meta property="og:image" content="https://studio.elawmaran.tech/assets/brand/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ELAW STUDIOS — AI Creative &amp; Digital Marketing Studio">
+  <meta name="twitter:description" content="AI-powered content, reels, films, 3D and digital experiences for modern brands.">
+  <meta name="twitter:image" content="https://studio.elawmaran.tech/assets/brand/og-image.png">
+
+  <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/brand/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "ELAW STUDIOS",
+    "description": "AI Creative & Digital Marketing Studio — AI-powered content, reels, video, 3D visuals, social campaigns and digital experiences for modern brands.",
+    "url": "https://studio.elawmaran.tech/",
+    "slogan": "Turning ideas into content, campaigns and digital experiences.",
+    "knowsAbout": ["AI content", "Social media marketing", "Reels", "Video production", "3D animation", "Motion graphics", "Websites", "AR/VR"]
+  }
+  </script>
+
+  <!-- Content (edit these files, not the HTML) -->
+  <script src="data/site.config.js" defer></script>
+  <script src="data/content.js" defer></script>
+  <script src="data/portfolio.js" defer></script>
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <!-- ============ HEADER ============ -->
+  <header class="nav" id="top">
+    <div class="nav__inner">
+      <a class="nav__brand" href="#top" aria-label="ELAW STUDIOS — home">
+        <span class="nav__mark" aria-hidden="true"></span>
+        <span class="nav__word">ELAW <b>STUDIOS</b></span>
+      </a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="#work">Work</a>
+        <a href="#services">Services</a>
+        <a href="#ai-lab">AI Lab</a>
+        <a href="#showroom">3D</a>
+        <a href="#process">Process</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <a class="btn btn--sm btn--light nav__cta" href="#start">Start a project</a>
+      <button class="nav__toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="mmenu" id="mobile-menu" hidden>
+    <nav aria-label="Mobile">
+      <a href="#work"><i>01</i>Work</a>
+      <a href="#services"><i>02</i>Services</a>
+      <a href="#ai-lab"><i>03</i>AI Lab</a>
+      <a href="#showroom"><i>04</i>3D</a>
+      <a href="#process"><i>05</i>Process</a>
+      <a href="#about"><i>06</i>About</a>
+      <a href="#contact"><i>07</i>Contact</a>
+    </nav>
+    <a class="btn btn--accent btn--block" href="#start">Start a project</a>
+    <div class="mmenu__social" data-social></div>
+  </div>
+
+  <main id="main">
+
+    <!-- ============ HERO ============ -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__stage" aria-hidden="true">
+        <canvas class="hero__canvas" id="core-canvas"></canvas>
+        <!-- CSS fallback Creative Core (shown until/unless WebGL loads) -->
+        <div class="core" id="core-fallback">
+          <div class="core__glow"></div>
+          <div class="core__shell"></div>
+          <div class="core__ring core__ring--a"></div>
+          <div class="core__ring core__ring--b"></div>
+          <div class="core__ring core__ring--c"></div>
+          <div class="core__heart"></div>
+          <div class="core__sats" data-core-sats></div>
+        </div>
+      </div>
+      <div class="hero__veil" aria-hidden="true"></div>
+
+      <div class="hero__content wrap">
+        <p class="eyebrow reveal"><span class="dot"></span>ELAW STUDIOS · AI Creative &amp; Digital Marketing Studio</p>
+        <h1 class="hero__title" id="hero-title">
+          <span class="line"><span>We turn ideas</span></span>
+          <span class="line"><span>into <em>experiences.</em></span></span>
+        </h1>
+        <p class="hero__sub reveal">AI-powered content, reels, films, 3D and digital experiences for modern brands.</p>
+        <div class="hero__ctas reveal">
+          <a class="btn btn--accent" href="#start">Start a project <span class="arr" aria-hidden="true">→</span></a>
+          <a class="btn btn--ghost" href="#work">Explore our work</a>
+        </div>
+      </div>
+
+      <div class="hero__foot wrap" aria-hidden="true">
+        <span class="mono">AI · Content · Social · Video · 3D · Digital</span>
+        <span class="hero__scroll mono">Scroll<i></i></span>
+      </div>
+    </section>
+
+    <!-- ============ POSITIONING STRIP ============ -->
+    <section class="pos" aria-label="What we do">
+      <div class="wrap pos__grid">
+        <div class="pos__item reveal"><span class="mono">What we do</span><p>AI, content, social, video, 3D and digital — under one studio.</p></div>
+        <div class="pos__item reveal"><span class="mono">Who it's for</span><p>Brands, businesses, startups and modern organisations.</p></div>
+        <div class="pos__item reveal"><span class="mono">Why ELAW</span><p>Creative direction backed by AI, technology and real production craft.</p></div>
+      </div>
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee__track">
+          <span>Social Content</span><span>Reels</span><span>AI Advertising</span><span>Brand Films</span><span>3D &amp; Motion</span><span>Digital Experiences</span><span>AR / VR</span><span>Campaigns</span>
+          <span>Social Content</span><span>Reels</span><span>AI Advertising</span><span>Brand Films</span><span>3D &amp; Motion</span><span>Digital Experiences</span><span>AR / VR</span><span>Campaigns</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ STORY: IDEA → IMPACT ============ -->
+    <section class="story" id="story" aria-labelledby="story-title">
+      <div class="story__sticky">
+        <div class="wrap story__inner">
+          <header class="story__head">
+            <p class="eyebrow"><span class="dot"></span>The journey</p>
+            <h2 id="story-title" class="h-section">From idea <span class="arrow-glyph">→</span> to <em>impact.</em></h2>
+            <p class="muted">We don't just post on social media. We take an idea all the way to an audience.</p>
+          </header>
+          <div class="story__stage">
+            <ol class="story__rail" data-story-rail></ol>
+            <div class="story__word" aria-live="polite">
+              <span class="story__count mono" data-story-count>01 / 07</span>
+              <div class="story__words" data-story-words></div>
+              <p class="story__line" data-story-line></p>
+            </div>
+          </div>
+          <div class="story__progress" aria-hidden="true"><i data-story-bar></i></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SERVICES ============ -->
+    <section class="services section" id="services" aria-labelledby="services-title">
+      <div class="wrap">
+        <header class="sec-head">
+          <p class="eyebrow reveal"><span class="dot"></span>Capabilities</p>
+          <h2 id="services-title" class="h-section reveal">Five disciplines.<br><em>One studio.</em></h2>
+        </header>
+        <div class="svc" data-services></div>
+      </div>
+    </section>
+
+    <!-- ============ SELECTED WORK ============ -->
+    <section class="selected section" id="work" aria-labelledby="work-title">
+      <div class="wrap">
+        <header class="sec-head sec-head--split">
+          <div>
+            <p class="eyebrow reveal"><span class="dot"></span>Selected work</p>
+            <h2 id="work-title" class="h-section reveal">Work that<br><em>moves.</em></h2>
+          </div>
+          <p class="muted reveal sec-head__aside">Studio explorations and ELAW LAB concept campaigns — every piece is labelled for what it is.</p>
+        </header>
+        <div class="featured" data-featured></div>
+      </div>
+    </section>
+
+    <!-- ============ PORTFOLIO ============ -->
+    <section class="portfolio section" id="portfolio" aria-labelledby="portfolio-title">
+      <div class="wrap">
+        <header class="sec-head sec-head--split">
+          <h2 id="portfolio-title" class="h-section h-section--sm reveal">All work</h2>
+          <div class="filters" role="tablist" aria-label="Filter work by category" data-filters></div>
+        </header>
+        <div class="grid-work" data-portfolio></div>
+        <p class="empty muted" data-portfolio-empty hidden>New work in this category is coming soon.</p>
+      </div>
+    </section>
+
+    <!-- ============ REELS ============ -->
+    <section class="reels section" id="reels" aria-labelledby="reels-title">
+      <div class="reels__bg" aria-hidden="true"></div>
+      <div class="wrap">
+        <header class="sec-head sec-head--center">
+          <p class="eyebrow reveal"><span class="dot"></span>Reels · Social Ads · Product Videos · AI Video</p>
+          <h2 id="reels-title" class="h-display reveal">Stop the <em>scroll.</em></h2>
+        </header>
+      </div>
+      <div class="reels__track" data-reels tabindex="0" aria-label="Reels showcase — scroll horizontally"></div>
+      <div class="wrap reels__hint mono" aria-hidden="true">Drag / swipe →</div>
+    </section>
+
+    <!-- ============ AI LAB ============ -->
+    <section class="lab section" id="ai-lab" aria-labelledby="lab-title">
+      <div class="wrap">
+        <header class="sec-head sec-head--split">
+          <div>
+            <p class="eyebrow reveal"><span class="dot"></span>ELAW LAB</p>
+            <h2 id="lab-title" class="h-section reveal">The AI<br>Creative <em>Lab.</em></h2>
+          </div>
+          <div class="sec-head__aside">
+            <p class="lead reveal">Where ideas become visuals.</p>
+            <p class="muted reveal">Experimental concepts generated and art-directed in-house. Lab work is self-initiated and never presented as client work.</p>
+          </div>
+        </header>
+        <div class="filters filters--lab" role="tablist" aria-label="Filter AI Lab by category" data-lab-filters></div>
+        <div class="masonry" data-lab></div>
+      </div>
+    </section>
+
+    <!-- ============ 3D SHOWROOM ============ -->
+    <section class="showroom section" id="showroom" aria-labelledby="showroom-title">
+      <div class="wrap">
+        <header class="sec-head sec-head--split">
+          <div>
+            <p class="eyebrow reveal"><span class="dot"></span>Real-time 3D</p>
+            <h2 id="showroom-title" class="h-section reveal">The ELAW<br>3D <em>Showroom.</em></h2>
+          </div>
+          <p class="muted reveal sec-head__aside">Drag to rotate, pinch or scroll to zoom. Every model here is a web-ready GLB — the same assets can power product pages, AR and motion.</p>
+        </header>
+        <div class="room reveal">
+          <div class="room__viewport" data-room-viewport>
+            <div class="room__floor" aria-hidden="true"></div>
+            <div class="room__loading mono" data-room-loading>Loading 3D…</div>
+            <button class="room__activate" type="button" data-room-activate>
+              <span class="room__activate-icon" aria-hidden="true"></span>
+              <span>Load interactive 3D</span>
+            </button>
+          </div>
+          <aside class="room__panel">
+            <span class="tag" data-room-type></span>
+            <h3 class="room__name" data-room-name></h3>
+            <p class="muted" data-room-text></p>
+            <div class="room__list" role="tablist" aria-label="Choose a 3D model" data-room-list></div>
+            <p class="room__help mono">GLB · PBR · optimised for web</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROCESS ============ -->
+    <section class="process section" id="process" aria-labelledby="process-title">
+      <div class="wrap">
+        <header class="sec-head">
+          <p class="eyebrow reveal"><span class="dot"></span>Process</p>
+          <h2 id="process-title" class="h-section reveal">How we <em>create.</em></h2>
+        </header>
+        <ol class="timeline" data-process></ol>
+      </div>
+    </section>
+
+    <!-- ============ WHY ELAW ============ -->
+    <section class="why section" id="why" aria-labelledby="why-title">
+      <div class="wrap">
+        <h2 id="why-title" class="visually-hidden">Why ELAW</h2>
+        <div class="why__grid" data-why></div>
+      </div>
+    </section>
+
+    <!-- ============ ABOUT ============ -->
+    <section class="about section" id="about" aria-labelledby="about-title">
+      <div class="wrap about__grid">
+        <div class="about__visual reveal" aria-hidden="true">
+          <div class="about__orb"></div>
+          <span class="about__badge mono">Independent<br>creative technology studio</span>
+        </div>
+        <div class="about__copy">
+          <p class="eyebrow reveal"><span class="dot"></span>About the studio</p>
+          <h2 id="about-title" class="h-section reveal">Creative thinking<br><em>backed by technology.</em></h2>
+          <p class="lead reveal">ELAW STUDIOS is an independent creative technology studio. We work directly with brands — founder-led on every project — and scale production through a trusted network of collaborators when the work demands it.</p>
+          <p class="muted reveal">Our roots are in game art, 3D, motion and quality-driven production. That background is why our AI work looks crafted, our 3D runs on the web, and our content is built to perform on every platform.</p>
+          <ul class="pills reveal" data-about-pillars></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ START A PROJECT ============ -->
+    <section class="start section" id="start" aria-labelledby="start-title">
+      <div class="start__glow" aria-hidden="true"></div>
+      <div class="wrap">
+        <header class="start__head">
+          <p class="eyebrow reveal"><span class="dot"></span>Start a project</p>
+          <h2 id="start-title" class="h-display reveal">Have an <em>idea?</em></h2>
+          <p class="lead reveal">Let's turn it into something people remember.</p>
+        </header>
+
+        <form class="form reveal" id="inquiry" novalidate>
+          <div class="form__grid">
+            <div class="field">
+              <label for="f-name">Name <span aria-hidden="true">*</span></label>
+              <input id="f-name" name="name" type="text" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="f-company">Company</label>
+              <input id="f-company" name="company" type="text" autocomplete="organization">
+            </div>
+            <div class="field">
+              <label for="f-email">Email <span aria-hidden="true">*</span></label>
+              <input id="f-email" name="email" type="email" autocomplete="email" required>
+            </div>
+            <div class="field">
+              <label for="f-country">Country</label>
+              <input id="f-country" name="country" type="text" autocomplete="country-name">
+            </div>
+
+            <fieldset class="field field--full">
+              <legend>Project type <span aria-hidden="true">*</span></legend>
+              <div class="chips" data-form-types></div>
+            </fieldset>
+
+            <div class="field field--full">
+              <label for="f-desc">Project description <span aria-hidden="true">*</span></label>
+              <textarea id="f-desc" name="description" rows="4" required placeholder="What are you making, who is it for, and what should it achieve?"></textarea>
+            </div>
+
+            <div class="field">
+              <label for="f-timeline">Timeline</label>
+              <select id="f-timeline" name="timeline" data-form-timelines><option value="">Select…</option></select>
+            </div>
+            <div class="field">
+              <label for="f-budget">Budget range</label>
+              <select id="f-budget" name="budget" data-form-budgets><option value="">Select…</option></select>
+            </div>
+
+            <div class="field field--full">
+              <label for="f-ref">Reference / website</label>
+              <input id="f-ref" name="reference" type="text" inputmode="url" placeholder="https://">
+            </div>
+            <div class="field field--full">
+              <label for="f-notes">Additional notes</label>
+              <textarea id="f-notes" name="notes" rows="3"></textarea>
+            </div>
+            <!-- honeypot -->
+            <div class="hp" aria-hidden="true"><label>Leave empty<input name="website_hp" tabindex="-1" autocomplete="off"></label></div>
+          </div>
+
+          <div class="form__foot">
+            <p class="muted form__note" data-form-note></p>
+            <button class="btn btn--accent btn--lg" type="submit">Request a proposal <span class="arr" aria-hidden="true">→</span></button>
+          </div>
+          <p class="form__status" role="status" aria-live="polite" data-form-status></p>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ CONTACT / FOOTER ============ -->
+  <footer class="footer" id="contact">
+    <div class="wrap">
+      <div class="footer__top">
+        <div>
+          <p class="eyebrow"><span class="dot"></span>Contact</p>
+          <a class="footer__mail" data-email href="#">hello@elawstudios.com</a>
+          <p class="muted" data-location></p>
+        </div>
+        <ul class="footer__social" data-social-list></ul>
+      </div>
+      <div class="footer__brand" aria-hidden="true">ELAW<span>STUDIOS</span></div>
+      <div class="footer__bottom mono">
+        <span>© <span data-year></span> ELAW STUDIOS</span>
+        <span>AI Creative &amp; Digital Marketing Studio</span>
+        <a href="#top">Back to top ↑</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ CASE STUDY VIEWER ============ -->
+  <dialog class="viewer" id="viewer" aria-labelledby="viewer-title">
+    <div class="viewer__inner">
+      <button class="viewer__close" type="button" data-close aria-label="Close">×</button>
+      <div class="viewer__body" data-viewer-body></div>
+    </div>
+  </dialog>
+
+  <noscript><style>.reveal,.hero__title .line>span{opacity:1!important;transform:none!important}</style></noscript>
+</body>
+</html>

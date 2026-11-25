@@ -1,0 +1,67 @@
+# =====================================================================
+# ELAW STUDIOS — Hostinger (LiteSpeed / Apache) server config
+# Site: https://studio.elawmaran.tech/
+# Upload this file together with index.html into the subdomain's folder.
+# =====================================================================
+
+Options -Indexes
+DirectoryIndex index.html
+
+# ---- Force HTTPS (enable SSL for the subdomain in hPanel first) ----
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Hide dev files from the public
+  RewriteRule ^(scripts/|package\.json|README\.md) - [F,L]
+</IfModule>
+
+# ---- Correct file types (3D, manifest, modern images/video) ----
+<IfModule mod_mime.c>
+  AddType model/gltf-binary            .glb
+  AddType model/gltf+json              .gltf
+  AddType application/manifest+json    .webmanifest
+  AddType image/webp                   .webp
+  AddType image/avif                   .avif
+  AddType video/webm                   .webm
+  AddType video/mp4                    .mp4
+  AddType image/svg+xml                .svg
+</IfModule>
+
+# ---- Compression ----
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript text/javascript application/json application/manifest+json image/svg+xml model/gltf+json model/gltf-binary
+</IfModule>
+
+# ---- Browser caching ----
+# HTML is always re-checked so content edits show up immediately.
+# CSS/JS/data are cached briefly; images, video and 3D for a long time.
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault                         "access plus 1 week"
+  ExpiresByType text/html                "access plus 0 seconds"
+  ExpiresByType text/css                 "access plus 1 day"
+  ExpiresByType application/javascript   "access plus 1 day"
+  ExpiresByType text/javascript          "access plus 1 day"
+  ExpiresByType image/webp               "access plus 6 months"
+  ExpiresByType image/avif               "access plus 6 months"
+  ExpiresByType image/png                "access plus 6 months"
+  ExpiresByType image/jpeg               "access plus 6 months"
+  ExpiresByType image/svg+xml            "access plus 6 months"
+  ExpiresByType video/mp4                "access plus 6 months"
+  ExpiresByType video/webm               "access plus 6 months"
+  ExpiresByType model/gltf-binary        "access plus 6 months"
+</IfModule>
+
+# ---- Security headers ----
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  <FilesMatch "\.(glb|gltf)$">
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
+</IfModule>
