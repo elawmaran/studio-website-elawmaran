@@ -35,6 +35,24 @@ window.ELAW.projectTypes = {
 
 window.ELAW.projects = [
   {
+    id: "mango-commercial",
+    featured: true,
+    title: "Mango",
+    subtitle: "Commercial video production",
+    category: ["Video"],
+    type: "lab",                          // change to "client" only if this was made for a real client
+    year: "2026",
+    description: "A short cinematic commercial for mango — product-hero visuals, motion and pacing built for a 10-second ad slot across social and web.",
+    thumbnail: "https://i.vimeocdn.com/video/2195992183-54cc31f70e9d82f9be5a7665d721eab11a7c3279e2b8c74543444784714dd426-d_1280?region=us",
+    heroVideo: "",
+    vimeoUrl: "https://vimeo.com/1222908196",
+    gallery: [],
+    tools: [],
+    process: [],
+    goal: "Show product-led commercial storytelling in a short-form ad format.",
+    art: { hue: 40, style: "orb" }
+  },
+  {
     id: "liquid-gold",
     featured: true,                       // shows in SELECTED WORK (first featured = large hero slot)
     title: "Liquid Gold",
