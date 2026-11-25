@@ -618,24 +618,38 @@
     const sats = C.coreSatellites || [];
     box.innerHTML = sats.map((s, i) => {
       const a = (i / sats.length) * Math.PI * 2 - Math.PI / 2, rad = 46;
-      return `<div class="core__sat" style="left:${50 + Math.cos(a) * rad}%;top:${50 + Math.sin(a) * rad}%"><span title="${esc(s)}">${iconSVG(s)}</span></div>`;
+      return `<div class="core__sat" style="left:${50 + Math.cos(a) * rad}%;top:${50 + Math.sin(a) * rad}%"><span title="${esc(s)}" style="--c1:${(ICON_TINTS[s] || [])[0] || "#cfd5dc"};--c2:${(ICON_TINTS[s] || [])[1] || "#59606a"}">${iconSVG(s)}</span></div>`;
     }).join("");
   }
 
-  /* Draw an icon badge to a canvas → texture for a Three.js sprite */
+  /* Draw a glossy 3D app-style icon tile to a canvas → texture for a Three.js sprite */
+  const ICON_TINTS = {
+    Camera: ["#ffd36b", "#e07b12"], Video: ["#ff8a7a", "#d8264a"], Social: ["#ff9fd0", "#d6267e"],
+    AI: ["#c9b2ff", "#6d3df0"], "3D": ["#8cf2ff", "#1b8fd6"], Digital: ["#9fb4ff", "#3b4fd8"], Music: ["#8ff0c0", "#14a06a"]
+  };
   function iconTexture(THREE, name) {
     const S = 256, c = document.createElement("canvas"); c.width = c.height = S;
-    const g = c.getContext("2d"), r = S / 2 - 10;
-    const bg = g.createRadialGradient(S * .38, S * .3, 10, S / 2, S / 2, r);
-    bg.addColorStop(0, "rgba(58,62,70,.92)"); bg.addColorStop(.7, "rgba(16,18,22,.92)"); bg.addColorStop(1, "rgba(8,9,11,.92)");
-    g.beginPath(); g.arc(S / 2, S / 2, r, 0, Math.PI * 2); g.fillStyle = bg; g.fill();
-    const rim = g.createLinearGradient(0, 0, S, S); rim.addColorStop(0, "rgba(255,255,255,.75)"); rim.addColorStop(.5, "rgba(255,255,255,.12)"); rim.addColorStop(1, TW ? "rgba(196,150,255,.9)" : "rgba(214,185,140,.8)");
-    g.lineWidth = 5; g.strokeStyle = rim; g.stroke();
+    const g = c.getContext("2d"), [c1, c2] = ICON_TINTS[name] || ["#cfd5dc", "#59606a"];
+    const R = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
+    const x = 30, y = 26, w = 196, h = 196, r = 54;
+    // contact shadow
+    g.save(); g.filter = "blur(10px)"; g.fillStyle = "rgba(0,0,0,.55)"; g.beginPath(); g.ellipse(S / 2, y + h + 8, 80, 12, 0, 0, Math.PI * 2); g.fill(); g.restore();
+    // body with depth: darker side edge + face gradient
+    R(x, y + 8, w, h, r); g.fillStyle = c2; g.fill();
+    R(x, y, w, h, r); const body = g.createLinearGradient(x, y, x + w * .6, y + h); body.addColorStop(0, c1); body.addColorStop(1, c2); g.fillStyle = body; g.fill();
+    // inner shading
+    R(x, y, w, h, r); const shade = g.createRadialGradient(x + w * .5, y + h * 1.1, 10, x + w * .5, y + h * .7, h * .8); shade.addColorStop(0, "rgba(0,0,0,.28)"); shade.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = shade; g.fill();
+    // glossy top highlight
+    g.save(); R(x, y, w, h, r); g.clip(); const gl = g.createLinearGradient(0, y, 0, y + h * .5); gl.addColorStop(0, "rgba(255,255,255,.75)"); gl.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = gl; g.beginPath(); g.ellipse(x + w / 2, y + h * .12, w * .46, h * .32, 0, 0, Math.PI * 2); g.fill(); g.restore();
+    // rim light
+    R(x + 1.5, y + 1.5, w - 3, h - 3, r - 2); g.lineWidth = 3; g.strokeStyle = "rgba(255,255,255,.45)"; g.stroke();
+    // icon glyph, white with soft drop shadow
     const ic = CORE_ICONS[name];
     if (ic) {
-      g.save(); const k = 5.4; g.translate(S / 2 - 12 * k, S / 2 - 12 * k); g.scale(k, k);
-      const ink = g.createLinearGradient(0, 3, 0, 21); ink.addColorStop(0, "#ffffff"); ink.addColorStop(.55, "#d6dae0"); ink.addColorStop(1, TW ? "#f3b8ff" : "#e6cfa6");
-      g.strokeStyle = ink; g.fillStyle = ink; g.lineWidth = 1.55; g.lineCap = "round"; g.lineJoin = "round";
+      g.save(); const k = 5.2; g.translate(S / 2 - 12 * k, y + h / 2 - 12 * k + 2); g.scale(k, k);
+      g.shadowColor = "rgba(0,0,0,.35)"; g.shadowBlur = 6; g.shadowOffsetY = 3;
+      g.strokeStyle = "#ffffff"; g.fillStyle = "#ffffff"; g.lineWidth = 1.9; g.lineCap = "round"; g.lineJoin = "round";
       ic.d.forEach(d => g.stroke(new Path2D(d))); (ic.fill || []).forEach(d => g.fill(new Path2D(d)));
       g.restore();
     }
@@ -670,20 +684,20 @@
     envScene.add(box);
     const panel = (w, h, pos, col, int) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(col).multiplyScalar(int), side: THREE.DoubleSide })); m.position.set(...pos); m.lookAt(0, 0, 0); envScene.add(m); };
     if (TW) { panel(10, 4, [0, 8, 2], 0xffffff, 3.5); panel(4, 9, [-9, 1, 3], 0x9b6bff, 3); panel(3, 8, [9, 0, -2], 0xffa27a, 3); panel(12, 2, [0, -6, 6], 0x5b3bd6, 1.2); }
-    else { panel(10, 4, [0, 8, 2], 0xffffff, 4); panel(4, 9, [-9, 1, 3], 0xffffff, 2.2); panel(3, 8, [9, 0, -2], 0xd6b98c, 3); panel(12, 2, [0, -6, 6], 0xffffff, .8); }
+    else { panel(10, 4, [0, 8, 2], 0xffffff, 4); panel(4, 9, [-9, 1, 3], 0xffffff, 2.2); panel(3, 8, [9, 0, -2], 0x8cf2ff, 3); panel(12, 2, [0, -6, 6], 0xffffff, .8); }
     const pmrem = new THREE.PMREMGenerator(renderer);
     scene.environment = pmrem.fromScene(envScene, 0.02).texture;
 
     const root = new THREE.Group(); scene.add(root);
-    const accent = new THREE.Color(TW ? 0xb48cff : 0xd6b98c);
+    const accent = new THREE.Color(TW ? 0xb48cff : 0x8cf2ff);
 
     // glass shell
     // glass shell: thin clear-coat surface + fresnel rim (cheaper and cleaner than transmission)
     const shellGeo = new THREE.SphereGeometry(1.35, mobile ? 48 : 96, mobile ? 48 : 96);
-    const shell = new THREE.Mesh(shellGeo, new THREE.MeshBasicMaterial({ color: LIGHT ? 0xffffff : TW ? 0xb48cff : 0xd6b98c, transparent: true, opacity: LIGHT ? 0.22 : TW ? 0.05 : 0.035, depthWrite: false }));
+    const shell = new THREE.Mesh(shellGeo, new THREE.MeshBasicMaterial({ color: LIGHT ? 0xffffff : TW ? 0xb48cff : 0x8cf2ff, transparent: true, opacity: LIGHT ? 0.22 : TW ? 0.05 : 0.035, depthWrite: false }));
     root.add(shell);
     const rimMat = new THREE.ShaderMaterial({
-      uniforms: { c: { value: new THREE.Color(LIGHT ? 0x9a7444 : TW ? 0xc4a0ff : 0xd6b98c) } }, transparent: true, depthWrite: false, blending: LIGHT ? THREE.NormalBlending : THREE.AdditiveBlending,
+      uniforms: { c: { value: new THREE.Color(LIGHT ? 0x9a7444 : TW ? 0xc4a0ff : 0x8cf2ff) } }, transparent: true, depthWrite: false, blending: LIGHT ? THREE.NormalBlending : THREE.AdditiveBlending,
       vertexShader: "varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix*vec4(position,1.0); vN = normalize(normalMatrix*normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix*mv; }",
       fragmentShader: LIGHT
         ? "uniform vec3 c; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - abs(dot(vN, vV)), 3.0); float hi = pow(max(dot(vN, normalize(vec3(-0.5,0.7,0.5))),0.0), 30.0); vec3 col = mix(vec3(1.0), c, f*0.55); gl_FragColor = vec4(mix(col, vec3(1.0), hi), clamp(f*0.55 + hi*0.8, 0.0, 1.0)); }"
@@ -712,7 +726,7 @@
     $(".hero__stage").appendChild(labels);
     const sats = satNames.map((name, i) => {
       const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: iconTexture(THREE, name), transparent: true, depthWrite: false }));
-      m.scale.set(0.3, 0.3, 1);
+      m.scale.set(0.36, 0.36, 1);
       const pivot = new THREE.Group(); pivot.rotation.set(Math.random() * Math.PI, (i / satNames.length) * Math.PI * 2, Math.random() * 0.6);
       m.position.x = 0.72 + (i % 3) * 0.15; pivot.add(m); root.add(pivot);
       const lab = document.createElement("span"); lab.textContent = name;
@@ -725,7 +739,7 @@
     const N = mobile ? 260 : 600, pos = new Float32Array(N * 3);
     for (let i = 0; i < N; i++) { const r = 2.4 + Math.random() * 3.5, t = Math.random() * Math.PI * 2, p = Math.acos(2 * Math.random() - 1); pos.set([r * Math.sin(p) * Math.cos(t), r * Math.cos(p) * .6, r * Math.sin(p) * Math.sin(t)], i * 3); }
     const dustG = new THREE.BufferGeometry(); dustG.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    const dust = new THREE.Points(dustG, new THREE.PointsMaterial({ size: 0.018, color: LIGHT ? 0x9a7444 : TW ? 0xe9dcff : 0xe8dfcf, transparent: true, opacity: LIGHT ? .35 : .55, depthWrite: false }));
+    const dust = new THREE.Points(dustG, new THREE.PointsMaterial({ size: 0.018, color: LIGHT ? 0x9a7444 : TW ? 0xe9dcff : 0xcfe9ee, transparent: true, opacity: LIGHT ? .35 : .55, depthWrite: false }));
     root.add(dust);
 
     // floating glass cubes (twilight theme)
