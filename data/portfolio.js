@@ -35,6 +35,24 @@ window.ELAW.projectTypes = {
 
 window.ELAW.projects = [
   {
+    id: "noir-perfume",
+    featured: true,
+    title: "Noir",
+    subtitle: "Perfume commercial production",
+    category: ["Video"],
+    type: "lab",                          // change to "client" only if this was made for a real client
+    year: "2026",
+    description: "A dark, cinematic fragrance commercial — sculpted light, slow product reveals and luxury pacing across a 27-second spot.",
+    thumbnail: "https://i.vimeocdn.com/video/2214330848-5312b28f6423ac3c17b8e11ace2d61e632d2afeb2f96acb7694e15d9e0c2739b-d_1280?region=us",
+    heroVideo: "",
+    vimeoUrl: "https://vimeo.com/1237524947",
+    gallery: [],
+    tools: [],
+    process: [],
+    goal: "Show premium, mood-led product storytelling for luxury brands.",
+    art: { hue: 280, style: "beam" }
+  },
+  {
     id: "mango-commercial",
     featured: true,
     title: "Mango",
@@ -53,8 +71,44 @@ window.ELAW.projects = [
     art: { hue: 40, style: "orb" }
   },
   {
+    id: "coffee-commercial",
+    featured: true,
+    title: "Coffee",
+    subtitle: "Commercial video production",
+    category: ["Video"],
+    type: "lab",                          // change to "client" only if this was made for a real client
+    year: "2026",
+    description: "A warm, sensory coffee commercial — close-up textures, pour moments and a rhythm built for a 22-second ad.",
+    thumbnail: "https://i.vimeocdn.com/video/2195992115-c30c5643920f536d5e6091799c7b3aab52a0671d7e7e3ffb52a914ca78253a83-d_1280?region=us",
+    heroVideo: "",
+    vimeoUrl: "https://vimeo.com/1222908143",
+    gallery: [],
+    tools: [],
+    process: [],
+    goal: "Make an everyday product feel crafted and desirable.",
+    art: { hue: 28, style: "beam" }
+  },
+  {
+    id: "sweets-ai-ad",
+    featured: true,
+    title: "Sweet Shop",
+    subtitle: "AI advertisement",
+    category: ["AI", "Video"],
+    type: "lab",                          // change to "client" only if this was made for a real client
+    year: "2026",
+    description: "A short AI-produced advertisement for a traditional sweet shop — appetite-led visuals generated and edited into an 8-second spot.",
+    thumbnail: "https://i.vimeocdn.com/video/2195856430-4310debf0f16c5c40596da13b66b0d1c3e125465df5f489b30e692d57f7585e0-d_1280?region=us",
+    heroVideo: "",
+    vimeoUrl: "https://vimeo.com/1222806571",
+    gallery: [],
+    tools: [],
+    process: [],
+    goal: "Show how AI production can deliver a fast, affordable ad for local businesses.",
+    art: { hue: 330, style: "beam" }
+  },
+  {
     id: "liquid-gold",
-    featured: true,                       // shows in SELECTED WORK (first featured = large hero slot)
+    featured: false,                       // shows in SELECTED WORK (first featured = large hero slot)
     title: "Liquid Gold",
     subtitle: "Cinematic product film concept",
     category: ["Video", "3D", "AI"],
@@ -72,7 +126,7 @@ window.ELAW.projects = [
   },
   {
     id: "neon-monsoon",
-    featured: true,
+    featured: false,
     title: "Neon Monsoon",
     subtitle: "AI fashion campaign concept",
     category: ["AI", "Social"],
@@ -108,7 +162,7 @@ window.ELAW.projects = [
   },
   {
     id: "stop-scroll-system",
-    featured: true,
+    featured: false,
     title: "Stop-Scroll Reel System",
     subtitle: "Short-form video framework",
     category: ["Reels", "Social", "Video"],
@@ -126,7 +180,7 @@ window.ELAW.projects = [
   },
   {
     id: "elaw-ai",
-    featured: true,
+    featured: false,
     title: "ELAW AI",
     subtitle: "Self-hosted open-source LLM assistant",
     category: ["Digital", "AI"],
