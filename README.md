@@ -100,7 +100,7 @@ This uses the same setup as **qa.elawmaran.tech**: a public GitHub repo served b
    (The same pattern as the existing `qa` record.)
 3. When the DNS check turns green in GitHub → Settings → Pages, tick **Enforce HTTPS**.
 
-**Updating the site:** edit the files (usually `data/portfolio.js` plus new files in `assets/`), then
+**Updating the site:** edit the files, bump the `?v=` number on the CSS/JS links in `index.html` (so visitors don't get cached copies) (usually `data/portfolio.js` plus new files in `assets/`), then
 ```bash
 git add -A && git commit -m "Add new work" && git push
 ```
