@@ -564,6 +564,14 @@
 
   function initParallax() {
     if (REDUCED) return;
+    const brand = $("[data-brand-reveal]");
+    if (brand) onScroll(() => {
+      const r = brand.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > innerHeight) return;
+      const p = Math.min(1, Math.max(0, 1 - (r.top + r.height * 0.5) / (innerHeight + r.height * 0.5))); // 0 entering → 1 leaving
+      brand.style.setProperty("--bs", (1.14 - Math.min(p, 0.55) * 0.25).toFixed(4));
+      brand.style.setProperty("--bo", Math.min(1, 0.35 + p * 1.6).toFixed(3));
+    });
     onScroll(() => {
       $$("[data-parallax]").forEach(el => {
         const r = el.getBoundingClientRect();
