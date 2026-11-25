@@ -38,7 +38,7 @@
   }
   function vimeoEmbedURL(url, { autoplay = true, background = false } = {}) {
     const v = parseVimeo(url); if (!v) return "";
-    const q = new URLSearchParams({ autoplay: autoplay ? 1 : 0, title: 0, byline: 0, portrait: 0, dnt: 1, color: "8cf2ff" });
+    const q = new URLSearchParams({ autoplay: autoplay ? 1 : 0, title: 0, byline: 0, portrait: 0, dnt: 1, color: "ff8f3f" });
     if (v.hash) q.set("h", v.hash);
     if (background) { q.set("background", 1); q.set("muted", 1); q.set("loop", 1); }
     return `https://player.vimeo.com/video/${v.id}?${q}`;
@@ -620,20 +620,20 @@
     const box = new THREE.Mesh(new THREE.BoxGeometry(20, 20, 20), new THREE.MeshBasicMaterial({ color: 0x050608, side: THREE.BackSide }));
     envScene.add(box);
     const panel = (w, h, pos, col, int) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(col).multiplyScalar(int), side: THREE.DoubleSide })); m.position.set(...pos); m.lookAt(0, 0, 0); envScene.add(m); };
-    panel(10, 4, [0, 8, 2], 0xffffff, 4); panel(4, 9, [-9, 1, 3], 0xffffff, 2.2); panel(3, 8, [9, 0, -2], 0x8cf2ff, 3); panel(12, 2, [0, -6, 6], 0xffffff, .8);
+    panel(10, 4, [0, 8, 2], 0xffffff, 4); panel(4, 9, [-9, 1, 3], 0xffffff, 2.2); panel(3, 8, [9, 0, -2], 0xff8f3f, 3); panel(12, 2, [0, -6, 6], 0xffffff, .8);
     const pmrem = new THREE.PMREMGenerator(renderer);
     scene.environment = pmrem.fromScene(envScene, 0.02).texture;
 
     const root = new THREE.Group(); scene.add(root);
-    const accent = new THREE.Color(0x8cf2ff);
+    const accent = new THREE.Color(0xff8f3f);
 
     // glass shell
     // glass shell: thin clear-coat surface + fresnel rim (cheaper and cleaner than transmission)
     const shellGeo = new THREE.SphereGeometry(1.35, mobile ? 48 : 96, mobile ? 48 : 96);
-    const shell = new THREE.Mesh(shellGeo, new THREE.MeshBasicMaterial({ color: 0x8cf2ff, transparent: true, opacity: 0.035, depthWrite: false }));
+    const shell = new THREE.Mesh(shellGeo, new THREE.MeshBasicMaterial({ color: 0xff8f3f, transparent: true, opacity: 0.035, depthWrite: false }));
     root.add(shell);
     const rimMat = new THREE.ShaderMaterial({
-      uniforms: { c: { value: new THREE.Color(0x8cf2ff) } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      uniforms: { c: { value: new THREE.Color(0xff8f3f) } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
       vertexShader: "varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix*vec4(position,1.0); vN = normalize(normalMatrix*normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix*mv; }",
       fragmentShader: "uniform vec3 c; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - abs(dot(vN, vV)), 2.6); float hi = pow(max(dot(vN, normalize(vec3(-0.5,0.7,0.5))),0.0), 40.0); gl_FragColor = vec4(c * f * 0.85 + vec3(f*f*0.4 + hi*0.6), clamp(f + hi*0.6, 0.0, 1.0)); }"
     });
@@ -684,7 +684,7 @@
     const N = mobile ? 260 : 600, pos = new Float32Array(N * 3);
     for (let i = 0; i < N; i++) { const r = 2.4 + Math.random() * 3.5, t = Math.random() * Math.PI * 2, p = Math.acos(2 * Math.random() - 1); pos.set([r * Math.sin(p) * Math.cos(t), r * Math.cos(p) * .6, r * Math.sin(p) * Math.sin(t)], i * 3); }
     const dustG = new THREE.BufferGeometry(); dustG.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    const dust = new THREE.Points(dustG, new THREE.PointsMaterial({ size: 0.018, color: 0xcfe9ee, transparent: true, opacity: .55, depthWrite: false }));
+    const dust = new THREE.Points(dustG, new THREE.PointsMaterial({ size: 0.018, color: 0xf2dccb, transparent: true, opacity: .55, depthWrite: false }));
     root.add(dust);
 
     const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(3, 5, 4); scene.add(key);
