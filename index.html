@@ -29,10 +29,13 @@
   <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
 
+  <script>/* theme preview: add ?theme=dark | light | twilight to the URL */
+    (function(){ try { var t = new URLSearchParams(location.search).get("theme"); if (t && /^(dark|light|twilight)$/.test(t)) document.documentElement.setAttribute("data-theme", t === "dark" ? "" : t); } catch (e) {} })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=202611252340">
+  <link rel="stylesheet" href="css/styles.css?v=202611252350">
 
   <script type="application/ld+json">
   {
@@ -47,10 +50,10 @@
   </script>
 
   <!-- Content (edit these files, not the HTML) -->
-  <script src="data/site.config.js?v=202611252340" defer></script>
-  <script src="data/content.js?v=202611252340" defer></script>
-  <script src="data/portfolio.js?v=202611252340" defer></script>
-  <script src="js/main.js?v=202611252340" defer></script>
+  <script src="data/site.config.js?v=202611252350" defer></script>
+  <script src="data/content.js?v=202611252350" defer></script>
+  <script src="data/portfolio.js?v=202611252350" defer></script>
+  <script src="js/main.js?v=202611252350" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
