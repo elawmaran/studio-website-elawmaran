@@ -630,32 +630,41 @@
   function iconTexture(THREE, name) {
     const S = 256, c = document.createElement("canvas"); c.width = c.height = S;
     const g = c.getContext("2d"), [c1, c2] = ICON_TINTS[name] || ["#cfd5dc", "#59606a"];
-    const cx = S / 2, cy = S / 2 - 6, rad = 100;
-    // contact shadow
-    g.save(); g.filter = "blur(9px)"; g.fillStyle = "rgba(0,0,0,.6)"; g.beginPath(); g.ellipse(cx, cy + rad + 10, rad * .62, 11, 0, 0, Math.PI * 2); g.fill(); g.restore();
-    // sphere body: lit from top-left
+    const cx = S / 2, cy = S / 2 - 4, rad = 100;
+    // light contact shadow
+    g.save(); g.filter = "blur(8px)"; g.fillStyle = "rgba(0,0,0,.28)"; g.beginPath(); g.ellipse(cx, cy + rad + 8, rad * .55, 8, 0, 0, Math.PI * 2); g.fill(); g.restore();
+    // sphere body: bright, gently shaded towards the edge
     g.beginPath(); g.arc(cx, cy, rad, 0, Math.PI * 2);
-    const body = g.createRadialGradient(cx - rad * .38, cy - rad * .42, rad * .08, cx, cy, rad);
-    body.addColorStop(0, c1); body.addColorStop(.55, c2); body.addColorStop(1, "rgba(10,10,16,1)");
+    const body = g.createRadialGradient(cx - rad * .35, cy - rad * .4, rad * .05, cx, cy, rad);
+    body.addColorStop(0, c1); body.addColorStop(.62, c2); body.addColorStop(1, c2);
     g.fillStyle = body; g.fill();
-    // bounce light from below
     g.save(); g.beginPath(); g.arc(cx, cy, rad, 0, Math.PI * 2); g.clip();
-    const bounce = g.createRadialGradient(cx + rad * .2, cy + rad * 1.05, 4, cx, cy + rad * .9, rad * .9); bounce.addColorStop(0, "rgba(140,242,255,.35)"); bounce.addColorStop(1, "rgba(140,242,255,0)");
-    g.fillStyle = bounce; g.fillRect(0, 0, S, S);
-    // glossy specular cap
-    const cap = g.createLinearGradient(0, cy - rad, 0, cy - rad * .05); cap.addColorStop(0, "rgba(255,255,255,.7)"); cap.addColorStop(1, "rgba(255,255,255,0)");
-    g.fillStyle = cap; g.beginPath(); g.ellipse(cx - rad * .08, cy - rad * .48, rad * .62, rad * .4, -0.25, 0, Math.PI * 2); g.fill();
-    // sharp hotspot
-    const hot = g.createRadialGradient(cx - rad * .42, cy - rad * .5, 0, cx - rad * .42, cy - rad * .5, rad * .2); hot.addColorStop(0, "rgba(255,255,255,.95)"); hot.addColorStop(1, "rgba(255,255,255,0)");
+    const edge = g.createRadialGradient(cx, cy, rad * .7, cx, cy, rad); edge.addColorStop(0, "rgba(0,0,0,0)"); edge.addColorStop(1, "rgba(0,0,0,.18)");
+    g.fillStyle = edge; g.fillRect(0, 0, S, S);
+    // subtle diamond (brilliant) cut: octagon table + star and girdle facets
+    const N = 8, tR = rad * .46, rot = Math.PI / 8, P = (r, k) => [cx + Math.cos(rot + k * Math.PI * 2 / N) * r, cy + Math.sin(rot + k * Math.PI * 2 / N) * r];
+    for (let k = 0; k < N; k++) {
+      const [ax, ay] = P(tR, k), [bx, by] = P(tR, k + 1), [ox, oy] = P(rad * 1.02, k + .5), [o1x, o1y] = P(rad * 1.02, k), [o2x, o2y] = P(rad * 1.02, k + 1);
+      g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.lineTo(ox, oy); g.closePath(); g.fillStyle = k % 2 ? "rgba(255,255,255,.09)" : "rgba(0,0,0,.06)"; g.fill();
+      g.beginPath(); g.moveTo(ax, ay); g.lineTo(o1x, o1y); g.lineTo(ox, oy); g.closePath(); g.fillStyle = k % 2 ? "rgba(0,0,0,.05)" : "rgba(255,255,255,.07)"; g.fill();
+    }
+    g.beginPath(); for (let k = 0; k <= N; k++) { const [px, py] = P(tR, k); k ? g.lineTo(px, py) : g.moveTo(px, py); } g.fillStyle = "rgba(255,255,255,.08)"; g.fill();
+    g.lineWidth = 1.2; g.strokeStyle = "rgba(255,255,255,.22)";
+    for (let k = 0; k < N; k++) { const [ax, ay] = P(tR, k), [ox, oy] = P(rad * 1.02, k + .5), [o1x, o1y] = P(rad * 1.02, k); g.beginPath(); g.moveTo(o1x, o1y); g.lineTo(ax, ay); g.lineTo(ox, oy); g.stroke(); }
+    g.beginPath(); for (let k = 0; k <= N; k++) { const [px, py] = P(tR, k); k ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke();
+    // glossy cap + hotspot
+    const cap = g.createLinearGradient(0, cy - rad, 0, cy - rad * .1); cap.addColorStop(0, "rgba(255,255,255,.55)"); cap.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = cap; g.beginPath(); g.ellipse(cx - rad * .08, cy - rad * .5, rad * .6, rad * .36, -0.25, 0, Math.PI * 2); g.fill();
+    const hot = g.createRadialGradient(cx - rad * .42, cy - rad * .5, 0, cx - rad * .42, cy - rad * .5, rad * .18); hot.addColorStop(0, "rgba(255,255,255,.9)"); hot.addColorStop(1, "rgba(255,255,255,0)");
     g.fillStyle = hot; g.fillRect(0, 0, S, S); g.restore();
-    // fine rim
-    g.beginPath(); g.arc(cx, cy, rad - 1.5, 0, Math.PI * 2); g.lineWidth = 2.5; g.strokeStyle = "rgba(255,255,255,.28)"; g.stroke();
+    // bright rim
+    g.beginPath(); g.arc(cx, cy, rad - 1.5, 0, Math.PI * 2); g.lineWidth = 3; g.strokeStyle = "rgba(255,255,255,.4)"; g.stroke();
     const x = cx - 98, y = cy - 98, h = 196;
     // icon glyph, white with soft drop shadow
     const ic = CORE_ICONS[name];
     if (ic) {
       g.save(); const k = 5.2; g.translate(S / 2 - 12 * k, y + h / 2 - 12 * k + 2); g.scale(k, k);
-      g.shadowColor = "rgba(0,0,0,.35)"; g.shadowBlur = 6; g.shadowOffsetY = 3;
+      g.shadowColor = "rgba(0,0,0,.22)"; g.shadowBlur = 4; g.shadowOffsetY = 2;
       g.strokeStyle = "#ffffff"; g.fillStyle = "#ffffff"; g.lineWidth = 1.9; g.lineCap = "round"; g.lineJoin = "round";
       ic.d.forEach(d => g.stroke(new Path2D(d))); (ic.fill || []).forEach(d => g.fill(new Path2D(d)));
       g.restore();
