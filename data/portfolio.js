@@ -261,11 +261,13 @@ window.ELAW.projects = [
    vimeoUrl (optional): opens the full reel in the viewer when tapped.
    --------------------------------------------------------------------- */
 window.ELAW.reels = [
-  { title: "Product Drop", category: "Product Videos", type: "lab",         video: "", poster: "", vimeoUrl: "", art: { hue: 28,  style: "beam"  } },
-  { title: "Hook in 1s",   category: "Reels",          type: "lab",         video: "", poster: "", vimeoUrl: "", art: { hue: 340, style: "wave"  } },
-  { title: "Dream Sequence", category: "AI Video",     type: "lab",         video: "", poster: "", vimeoUrl: "", art: { hue: 200, style: "orb"   } },
-  { title: "Swipe Story",  category: "Social Ads",     type: "lab",         video: "", poster: "", vimeoUrl: "", art: { hue: 150, style: "grid"  } },
-  { title: "Studio Loop",  category: "Reels",          type: "exploration", video: "", poster: "", vimeoUrl: "", art: { hue: 260, style: "rings" } }
+  // Empty slots show a polished "Coming soon" phone. Fill `vimeoUrl` (vertical 9:16 Vimeo) or `video` + `poster`.
+  { title: "Reels",          category: "Reels",          type: "lab", video: "", poster: "", vimeoUrl: "", art: { hue: 28,  style: "beam"  } },
+  { title: "Social Ads",     category: "Social Ads",     type: "lab", video: "", poster: "", vimeoUrl: "", art: { hue: 340, style: "wave"  } },
+  { title: "Product Videos", category: "Product Videos", type: "lab", video: "", poster: "", vimeoUrl: "", art: { hue: 200, style: "orb"   } },
+  { title: "AI Video",       category: "AI Video",       type: "lab", video: "", poster: "", vimeoUrl: "", art: { hue: 150, style: "grid"  } },
+  { title: "Brand Stories",  category: "Reels",          type: "lab", video: "", poster: "", vimeoUrl: "", art: { hue: 260, style: "rings" } },
+  { title: "Launch Teasers", category: "Social Ads",     type: "lab", video: "", poster: "", vimeoUrl: "", art: { hue: 48,  style: "prism" } }
 ];
 
 /* ---------------------------------------------------------------------

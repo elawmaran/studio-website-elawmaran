@@ -291,12 +291,16 @@
             ${r.poster ? imgHTML(r.poster, r.title) : artHTML(r.art, r.title)}
             ${r.video ? `<video muted loop playsinline preload="none" data-src="${esc(r.video)}" ${r.poster ? `poster="${esc(r.poster)}"` : ""} aria-label="${esc(r.title)}"></video>` : ""}
             <div class="phone__side" aria-hidden="true"><i></i><i></i><i></i></div>
-            <div class="phone__ui">${tagHTML(r.type)}<strong>${esc(r.title)}</strong></div>
+            ${!(r.video || r.vimeoUrl || r.poster) ? `<div class="phone__soon" aria-hidden="true"><i></i>Coming soon</div>` : ""}
+            <div class="phone__ui">${r.video || r.vimeoUrl ? tagHTML(r.type) : ""}<strong>${esc(r.title)}</strong></div>
           </div>
           ${(r.vimeoUrl || r.video) ? `<button class="phone__btn" type="button" data-reel="${i}" aria-label="Play ${esc(r.title)}"></button>` : ""}
         </div>
         <figcaption class="phone__cap mono">${esc(r.category)}</figcaption>
       </figure>`).join("");
+
+    const ready = reels.filter(r => r.video || r.vimeoUrl).length, note = $("[data-reels-note]");
+    if (note) note.textContent = ready ? `${ready} reel${ready > 1 ? "s" : ""} · more dropping soon` : "New reels dropping soon";
 
     // lazy-load + autoplay when on screen
     if (!REDUCED && "IntersectionObserver" in window) {

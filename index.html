@@ -32,7 +32,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=202611252115">
+  <link rel="stylesheet" href="css/styles.css?v=202611252130">
 
   <script type="application/ld+json">
   {
@@ -47,10 +47,10 @@
   </script>
 
   <!-- Content (edit these files, not the HTML) -->
-  <script src="data/site.config.js?v=202611252115" defer></script>
-  <script src="data/content.js?v=202611252115" defer></script>
-  <script src="data/portfolio.js?v=202611252115" defer></script>
-  <script src="js/main.js?v=202611252115" defer></script>
+  <script src="data/site.config.js?v=202611252130" defer></script>
+  <script src="data/content.js?v=202611252130" defer></script>
+  <script src="data/portfolio.js?v=202611252130" defer></script>
+  <script src="js/main.js?v=202611252130" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -214,7 +214,7 @@
         </header>
       </div>
       <div class="reels__track" data-reels tabindex="0" aria-label="Reels showcase — scroll horizontally"></div>
-      <div class="wrap reels__hint mono" aria-hidden="true">Drag / swipe →</div>
+      <div class="wrap reels__hint mono" aria-hidden="true"><span data-reels-note></span><span>Drag / swipe →</span></div>
     </section>
 
     <!-- ============ AI LAB ============ -->
@@ -287,10 +287,14 @@
     <!-- ============ ABOUT ============ -->
     <section class="about section" id="about" aria-labelledby="about-title">
       <div class="wrap about__grid">
-        <div class="about__visual reveal" aria-hidden="true">
-          <div class="about__orb"></div>
-          <span class="about__badge mono">Independent<br>creative technology studio</span>
-        </div>
+        <figure class="about__visual reveal">
+          <img src="assets/brand/founder-portrait.webp"
+               srcset="assets/brand/founder-portrait-720.webp 720w, assets/brand/founder-portrait.webp 1200w"
+               sizes="(max-width: 1100px) 100vw, 40vw"
+               width="1200" height="1500" loading="lazy" decoding="async"
+               alt="Elamaran, founder of ELAW STUDIOS, in a production studio with cameras and editing screens">
+          <figcaption class="about__badge mono">Founder-led<br>creative technology studio</figcaption>
+        </figure>
         <div class="about__copy">
           <p class="eyebrow reveal"><span class="dot"></span>About the studio</p>
           <h2 id="about-title" class="h-section reveal">Creative thinking<br><em>backed by technology.</em></h2>
