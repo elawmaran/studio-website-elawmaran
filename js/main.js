@@ -608,7 +608,7 @@
     const box = new THREE.Mesh(new THREE.BoxGeometry(20, 20, 20), new THREE.MeshBasicMaterial({ color: 0x050608, side: THREE.BackSide }));
     envScene.add(box);
     const panel = (w, h, pos, col, int) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(col).multiplyScalar(int), side: THREE.DoubleSide })); m.position.set(...pos); m.lookAt(0, 0, 0); envScene.add(m); };
-    panel(8, 3, [0, 8, 2], 0xffffff, 3.2); panel(3, 8, [-9, 1, 3], 0xffffff, 1.6); panel(2, 7, [9, 0, -2], 0x8cf2ff, 2.2); panel(10, 1, [0, -6, 6], 0xffffff, .5);
+    panel(10, 4, [0, 8, 2], 0xffffff, 4); panel(4, 9, [-9, 1, 3], 0xffffff, 2.2); panel(3, 8, [9, 0, -2], 0x8cf2ff, 3); panel(12, 2, [0, -6, 6], 0xffffff, .8); panel(6, 6, [0, 0, 10], 0xffffff, .6);
     const pmrem = new THREE.PMREMGenerator(renderer);
     scene.environment = pmrem.fromScene(envScene, 0.02).texture;
 
@@ -616,20 +616,27 @@
     const accent = new THREE.Color(0x8cf2ff);
 
     // glass shell
-    const shell = new THREE.Mesh(new THREE.SphereGeometry(1.55, mobile ? 48 : 96, mobile ? 48 : 96),
-      new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0, roughness: 0.06, transmission: 1, thickness: 1.4, ior: 1.35, clearcoat: 1, clearcoatRoughness: 0.05, iridescence: 0.35, iridescenceIOR: 1.25, envMapIntensity: 1.3, transparent: true }));
+    // glass shell: thin clear-coat surface + fresnel rim (cheaper and cleaner than transmission)
+    const shellGeo = new THREE.SphereGeometry(1.35, mobile ? 48 : 96, mobile ? 48 : 96);
+    const shell = new THREE.Mesh(shellGeo, new THREE.MeshPhysicalMaterial({ color: 0xbfefff, metalness: 0.1, roughness: 0.04, clearcoat: 1, clearcoatRoughness: 0.03, iridescence: 0.4, envMapIntensity: 2.2, transparent: true, opacity: 0.16, depthWrite: false }));
     root.add(shell);
+    const rimMat = new THREE.ShaderMaterial({
+      uniforms: { c: { value: new THREE.Color(0x8cf2ff) } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      vertexShader: "varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix*vec4(position,1.0); vN = normalize(normalMatrix*normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix*mv; }",
+      fragmentShader: "uniform vec3 c; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - abs(dot(vN, vV)), 3.0); gl_FragColor = vec4(c * f * 0.9 + vec3(f*f*0.35), f); }"
+    });
+    root.add(new THREE.Mesh(shellGeo, rimMat));
     // inner faceted metal core + glowing heart
-    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.46, 1), new THREE.MeshStandardMaterial({ color: 0x1a1d22, metalness: 1, roughness: 0.22, flatShading: true }));
+    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 1), new THREE.MeshStandardMaterial({ color: 0x9aa3ad, metalness: 1, roughness: 0.28, flatShading: true, envMapIntensity: 1.4 }));
     root.add(core);
-    const heart = new THREE.Mesh(new THREE.SphereGeometry(0.2, 32, 32), new THREE.MeshBasicMaterial({ color: accent }));
+    const heart = new THREE.Mesh(new THREE.SphereGeometry(0.16, 32, 32), new THREE.MeshBasicMaterial({ color: accent }));
     root.add(heart);
     const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: radialTex(THREE), color: accent, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.55 }));
-    glow.scale.set(3.2, 3.2, 1); root.add(glow);
+    glow.scale.set(2.6, 2.6, 1); root.add(glow);
 
     // orbit rings
     const metal = new THREE.MeshStandardMaterial({ color: 0xdfe3e8, metalness: 1, roughness: 0.18 });
-    const rings = [[1.95, 0.012, 1.25, 0.2], [2.25, 0.006, -0.4, 0.9], [1.12, 0.008, 0.6, -0.6]].map(([r, t, rx, rz], i) => {
+    const rings = [[1.7, 0.01, 1.25, 0.2], [1.95, 0.005, -0.4, 0.9], [1.0, 0.007, 0.6, -0.6]].map(([r, t, rx, rz], i) => {
       const m = new THREE.Mesh(new THREE.TorusGeometry(r, t, 12, 220), i === 1 ? new THREE.MeshBasicMaterial({ color: accent, transparent: true, opacity: .55 }) : metal);
       m.rotation.set(rx, 0, rz); root.add(m); return m;
     });
@@ -654,7 +661,7 @@
       const mat = name === "3D" ? new THREE.MeshBasicMaterial({ color: accent, wireframe: true }) : name === "Digital" ? new THREE.MeshBasicMaterial({ color: accent, wireframe: true, side: THREE.DoubleSide }) : satMat;
       const m = new THREE.Mesh(g, mat);
       const pivot = new THREE.Group(); pivot.rotation.set(Math.random() * Math.PI, (i / satNames.length) * Math.PI * 2, Math.random() * 0.6);
-      m.position.x = 0.85 + (i % 3) * 0.17; pivot.add(m); root.add(pivot);
+      m.position.x = 0.72 + (i % 3) * 0.15; pivot.add(m); root.add(pivot);
       const lab = document.createElement("span"); lab.textContent = name;
       Object.assign(lab.style, { position: "absolute", left: "0", top: "0", fontFamily: "var(--f-mono)", fontSize: "10.5px", letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(243,244,246,.85)", padding: "5px 9px", borderRadius: "99px", border: "1px solid rgba(255,255,255,.14)", background: "rgba(8,10,13,.45)", backdropFilter: "blur(6px)", whiteSpace: "nowrap", willChange: "transform,opacity", transition: "opacity .4s" });
       labels.appendChild(lab);
@@ -677,7 +684,7 @@
       W = hero.clientWidth; H = hero.clientHeight;
       renderer.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix();
       const wide = W / H > 1.05;
-      baseX = wide ? Math.min(2.4, camera.aspect * 1.2) : 0.6; baseY = wide ? 0.25 : 1.1; baseS = wide ? 1 : 0.78;
+      baseX = wide ? Math.min(2.9, camera.aspect * 1.45) : 0.7; baseY = wide ? 0.2 : 1.35; baseS = wide ? 0.95 : 0.72;
     };
     resize(); addEventListener("resize", resize);
 
