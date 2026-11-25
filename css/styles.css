@@ -707,19 +707,19 @@ p { margin: 0 0 1em; }
     radial-gradient(900px 620px at 8% 6%, rgba(150,100,255,.30), transparent 62%),
     radial-gradient(1200px 800px at 50% 112%, rgba(110,70,230,.28), transparent 60%),
     linear-gradient(180deg, #160f34 0%, #0e0a22 38%, #120c2b 100%);
-  background-attachment: fixed;
 }
+@media (min-width: 1025px) { [data-theme="twilight"] body { background-attachment: fixed; } }
 [data-theme="twilight"] body::after {
-  content: ""; position: fixed; inset: -20%; z-index: -1; pointer-events: none; filter: blur(60px); opacity: .55;
-  background: radial-gradient(30% 25% at 30% 30%, rgba(167,120,255,.35), transparent 70%), radial-gradient(25% 22% at 70% 60%, rgba(255,140,190,.22), transparent 70%), radial-gradient(28% 24% at 55% 20%, rgba(90,200,255,.16), transparent 70%);
-  animation: aurora 26s ease-in-out infinite alternate;
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .7;
+  background: radial-gradient(38% 32% at 28% 28%, rgba(167,120,255,.22), transparent 70%), radial-gradient(32% 28% at 72% 62%, rgba(255,140,190,.14), transparent 70%), radial-gradient(34% 30% at 55% 18%, rgba(90,200,255,.10), transparent 70%);
+  animation: aurora 26s ease-in-out infinite alternate; will-change: transform;
 }
-@keyframes aurora { 0% { transform: translate3d(-4%, -2%, 0) rotate(0deg); } 100% { transform: translate3d(5%, 4%, 0) rotate(8deg); } }
+@keyframes aurora { 0% { transform: translate3d(-3%, -2%, 0) scale(1.05); } 100% { transform: translate3d(3%, 3%, 0) scale(1.12); } }
 [data-theme="twilight"] body::before { opacity: .035; }
 html[data-theme="twilight"] { background: #0e0a22; }
 [data-theme="twilight"] .hero__veil { background: radial-gradient(120% 80% at 70% 40%, transparent 40%, rgba(14,10,34,.35) 80%), linear-gradient(180deg, transparent 0%, transparent 70%, rgba(14,10,34,.4) 100%); }
 [data-theme="twilight"] .hero::after { content: ""; position: absolute; left: -10%; right: -10%; bottom: 8%; height: 34%; z-index: -2; pointer-events: none;
-  background: radial-gradient(50% 60% at 60% 100%, rgba(255,170,120,.22), transparent 70%), radial-gradient(40% 50% at 30% 100%, rgba(150,100,255,.25), transparent 70%); filter: blur(10px); }
+  background: radial-gradient(50% 60% at 60% 100%, rgba(255,170,120,.22), transparent 70%), radial-gradient(40% 50% at 30% 100%, rgba(150,100,255,.25), transparent 70%); }
 [data-theme="twilight"] .hero__title em, [data-theme="twilight"] .h-display em, [data-theme="twilight"] .h-section em { background: var(--metal); -webkit-background-clip: text; background-clip: text; color: transparent; font-style: italic; }
 [data-theme="twilight"] .hero__title { text-transform: none; letter-spacing: -.03em; }
 [data-theme="twilight"] .eyebrow { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
@@ -790,9 +790,11 @@ html[data-theme="twilight"] { background: #0e0a22; }
 @media (max-width: 760px) {
   [data-theme="twilight"] .svc { grid-template-columns: 1fr; }
   [data-theme="twilight"] .svc__row { display: grid; grid-template-columns: 76px 1fr; column-gap: 18px; align-items: start; }
-  [data-theme="twilight"] .svc__art { width: 70px; height: 70px; border-radius: 20px; grid-row: span 2; margin: 0; }
+  [data-theme="twilight"] .svc__art { width: 70px; height: 70px; border-radius: 20px; grid-column: 1; grid-row: 1 / span 2; margin: 0; }
+  [data-theme="twilight"] .svc__row > div:not(.svc__art) { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+  [data-theme="twilight"] .svc__title { font-size: 24px; }
   [data-theme="twilight"] .svc__art svg { width: 34px; height: 34px; }
-  [data-theme="twilight"] .svc__items { grid-column: 1 / -1; }
+  [data-theme="twilight"] .svc__items { grid-column: 1 / -1; grid-row: 3; margin-top: 14px; }
   [data-theme="twilight"] .svc__icon { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { [data-theme="twilight"] body::after, [data-theme="twilight"] .svc__art { animation: none; } }
