@@ -622,7 +622,7 @@
     }).join("");
   }
 
-  /* Draw a glossy 3D app-style icon tile to a canvas → texture for a Three.js sprite */
+  /* Draw a glossy 3D sphere icon to a canvas → texture for a Three.js sprite */
   const ICON_TINTS = {
     Camera: ["#ffd36b", "#e07b12"], Video: ["#ff8a7a", "#d8264a"], Social: ["#ff9fd0", "#d6267e"],
     AI: ["#c9b2ff", "#6d3df0"], "3D": ["#8cf2ff", "#1b8fd6"], Digital: ["#9fb4ff", "#3b4fd8"], Music: ["#8ff0c0", "#14a06a"]
@@ -630,20 +630,27 @@
   function iconTexture(THREE, name) {
     const S = 256, c = document.createElement("canvas"); c.width = c.height = S;
     const g = c.getContext("2d"), [c1, c2] = ICON_TINTS[name] || ["#cfd5dc", "#59606a"];
-    const R = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
-    const x = 30, y = 26, w = 196, h = 196, r = 54;
+    const cx = S / 2, cy = S / 2 - 6, rad = 100;
     // contact shadow
-    g.save(); g.filter = "blur(10px)"; g.fillStyle = "rgba(0,0,0,.55)"; g.beginPath(); g.ellipse(S / 2, y + h + 8, 80, 12, 0, 0, Math.PI * 2); g.fill(); g.restore();
-    // body with depth: darker side edge + face gradient
-    R(x, y + 8, w, h, r); g.fillStyle = c2; g.fill();
-    R(x, y, w, h, r); const body = g.createLinearGradient(x, y, x + w * .6, y + h); body.addColorStop(0, c1); body.addColorStop(1, c2); g.fillStyle = body; g.fill();
-    // inner shading
-    R(x, y, w, h, r); const shade = g.createRadialGradient(x + w * .5, y + h * 1.1, 10, x + w * .5, y + h * .7, h * .8); shade.addColorStop(0, "rgba(0,0,0,.28)"); shade.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = shade; g.fill();
-    // glossy top highlight
-    g.save(); R(x, y, w, h, r); g.clip(); const gl = g.createLinearGradient(0, y, 0, y + h * .5); gl.addColorStop(0, "rgba(255,255,255,.75)"); gl.addColorStop(1, "rgba(255,255,255,0)");
-    g.fillStyle = gl; g.beginPath(); g.ellipse(x + w / 2, y + h * .12, w * .46, h * .32, 0, 0, Math.PI * 2); g.fill(); g.restore();
-    // rim light
-    R(x + 1.5, y + 1.5, w - 3, h - 3, r - 2); g.lineWidth = 3; g.strokeStyle = "rgba(255,255,255,.45)"; g.stroke();
+    g.save(); g.filter = "blur(9px)"; g.fillStyle = "rgba(0,0,0,.6)"; g.beginPath(); g.ellipse(cx, cy + rad + 10, rad * .62, 11, 0, 0, Math.PI * 2); g.fill(); g.restore();
+    // sphere body: lit from top-left
+    g.beginPath(); g.arc(cx, cy, rad, 0, Math.PI * 2);
+    const body = g.createRadialGradient(cx - rad * .38, cy - rad * .42, rad * .08, cx, cy, rad);
+    body.addColorStop(0, c1); body.addColorStop(.55, c2); body.addColorStop(1, "rgba(10,10,16,1)");
+    g.fillStyle = body; g.fill();
+    // bounce light from below
+    g.save(); g.beginPath(); g.arc(cx, cy, rad, 0, Math.PI * 2); g.clip();
+    const bounce = g.createRadialGradient(cx + rad * .2, cy + rad * 1.05, 4, cx, cy + rad * .9, rad * .9); bounce.addColorStop(0, "rgba(140,242,255,.35)"); bounce.addColorStop(1, "rgba(140,242,255,0)");
+    g.fillStyle = bounce; g.fillRect(0, 0, S, S);
+    // glossy specular cap
+    const cap = g.createLinearGradient(0, cy - rad, 0, cy - rad * .05); cap.addColorStop(0, "rgba(255,255,255,.7)"); cap.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = cap; g.beginPath(); g.ellipse(cx - rad * .08, cy - rad * .48, rad * .62, rad * .4, -0.25, 0, Math.PI * 2); g.fill();
+    // sharp hotspot
+    const hot = g.createRadialGradient(cx - rad * .42, cy - rad * .5, 0, cx - rad * .42, cy - rad * .5, rad * .2); hot.addColorStop(0, "rgba(255,255,255,.95)"); hot.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = hot; g.fillRect(0, 0, S, S); g.restore();
+    // fine rim
+    g.beginPath(); g.arc(cx, cy, rad - 1.5, 0, Math.PI * 2); g.lineWidth = 2.5; g.strokeStyle = "rgba(255,255,255,.28)"; g.stroke();
+    const x = cx - 98, y = cy - 98, h = 196;
     // icon glyph, white with soft drop shadow
     const ic = CORE_ICONS[name];
     if (ic) {

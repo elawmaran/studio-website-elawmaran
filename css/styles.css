@@ -198,8 +198,8 @@ p { margin: 0 0 1em; }
 .core__heart { inset: 38%; background: radial-gradient(circle at 35% 30%, #fff 0%, #c5f8ff 18%, var(--accent) 40%, rgba(140,242,255,.1) 72%, transparent 74%); filter: blur(.5px); box-shadow: 0 0 80px 10px var(--accent-glow); animation: breathe 5s ease-in-out infinite; }
 .core__sats { inset: 0; opacity: .8; animation: orbit 60s linear infinite; }
 .core__sat { position: absolute; left: 50%; top: 50%; width: 0; height: 0; }
-.core__sat span { position: absolute; transform: translate(-50%,-50%); width: 58px; height: 58px; border-radius: 17px; display: grid; place-items: center; color: #fff; background: linear-gradient(145deg, var(--c1, #cfd5dc), var(--c2, #59606a)); box-shadow: inset 0 2px 1px rgba(255,255,255,.55), inset 0 -8px 14px rgba(0,0,0,.25), 0 10px 22px -6px rgba(0,0,0,.7); animation: counter 60s linear infinite; }
-.core__sat span::before { content: ""; position: absolute; inset: 3px 6px auto; height: 42%; border-radius: 14px 14px 50% 50%; background: linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,0)); }
+.core__sat span { position: absolute; transform: translate(-50%,-50%); width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: radial-gradient(circle at 32% 28%, var(--c1, #cfd5dc) 0%, var(--c2, #59606a) 55%, #0a0a10 100%); box-shadow: inset 0 -6px 12px rgba(140,242,255,.18), inset 0 0 0 1px rgba(255,255,255,.22), 0 12px 22px -8px rgba(0,0,0,.8); animation: counter 60s linear infinite; }
+.core__sat span::before { content: ""; position: absolute; left: 14%; right: 22%; top: 7%; height: 38%; border-radius: 50%; background: linear-gradient(180deg, rgba(255,255,255,.6), rgba(255,255,255,0)); transform: rotate(-14deg); }
 .core__sat span svg { position: relative; filter: drop-shadow(0 2px 2px rgba(0,0,0,.3)); }
 .core__sat svg { width: 27px; height: 27px; }
 @keyframes orbit { to { transform: rotate(360deg); } }
