@@ -161,12 +161,13 @@ p { margin: 0 0 1em; }
     radial-gradient(120% 80% at 70% 40%, transparent 30%, rgba(6,7,9,.55) 70%, var(--bg) 100%),
     linear-gradient(180deg, rgba(6,7,9,.3) 0%, transparent 25%, transparent 55%, var(--bg) 100%); }
 .hero__content { position: relative; padding-bottom: clamp(40px, 7vh, 90px); }
-.hero__title { font-size: clamp(54px, 10.4vw, 172px); font-weight: 600; letter-spacing: -.055em; line-height: .88; margin: 0 0 30px; text-transform: uppercase; }
+.hero__title { font-size: clamp(42px, 6.6vw, 108px); font-weight: 600; letter-spacing: -.045em; line-height: .94; margin: 0 0 28px; text-transform: uppercase; }
+.hero__title .line { white-space: nowrap; }
 .hero__title .line { display: block; overflow: hidden; padding-bottom: .04em; }
 .hero__title .line > span { display: inline-block; transform: translateY(105%); transition: transform 1.4s var(--ease); }
 .hero__title .line:nth-child(2) > span { transition-delay: .12s; }
 .is-ready .hero__title .line > span { transform: none; }
-.hero__title em { text-transform: none; font-size: 1.04em; background: var(--metal); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: .05em; }
+.hero__title em { text-transform: none; font-size: 1.08em; letter-spacing: -.03em; background: var(--metal); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: .05em; }
 .hero__sub { max-width: 520px; font-size: clamp(17px, 1.5vw, 21px); color: var(--text-2); margin-bottom: 34px; --d: .35s; }
 .hero__ctas { display: flex; flex-wrap: wrap; gap: 12px; --d: .5s; }
 .hero .eyebrow { --d: .1s; }
@@ -526,7 +527,7 @@ p { margin: 0 0 1em; }
   .core { width: 86vw; right: -22vw; top: 25%; opacity: .7; }
   .core__sats { opacity: .55; }
   .hero__veil { background: radial-gradient(120% 70% at 70% 25%, transparent 25%, rgba(6,7,9,.6) 65%, var(--bg) 100%), linear-gradient(180deg, transparent 30%, rgba(6,7,9,.85) 62%, var(--bg) 100%); }
-  .hero__title { font-size: clamp(44px, 13.4vw, 80px); }
+  .hero__title { font-size: clamp(38px, 11vw, 60px); }
   .hero__ctas .btn { flex: 1 1 100%; }
   .hero__foot .mono:first-child { display: none; }
   .hero__foot { justify-content: center; }
