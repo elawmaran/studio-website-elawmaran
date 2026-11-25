@@ -585,13 +585,49 @@
   /* =====================================================================
      HERO — ELAW CREATIVE CORE  (Three.js, with CSS fallback)
      ===================================================================== */
+  /* Icons for the Creative Core (24×24 line icons, drawn for ELAW) */
+  const circ = (x, y, r) => `M${x - r} ${y}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`;
+  const CORE_ICONS = {
+    Camera:  { d: ["M3.5 8.5h3.2l1.8-2.6h7l1.8 2.6h3.2v10.6H3.5z", circ(12, 13.6, 3.6), circ(17.6, 10.6, .4)] },
+    Video:   { d: ["M3.5 6.5h17v11h-17z"], fill: ["M10 9.4v5.2l4.6-2.6z"] },
+    Social:  { d: ["M12 19.5s-7-4.3-7-9.3A3.9 3.9 0 0 1 12 7.6a3.9 3.9 0 0 1 7 2.6c0 5-7 9.3-7 9.3z"] },
+    AI:      { d: ["M12 3.5l2 6.5 6.5 2-6.5 2-2 6.5-2-6.5-6.5-2 6.5-2z", "M18.5 3.8v3M17 5.3h3"] },
+    "3D":    { d: ["M12 3.6l7.6 4.3v8.4L12 20.6l-7.6-4.3V7.9z", "M12 12.2l7.6-4.3M12 12.2v8.4M12 12.2L4.4 7.9"] },
+    Digital: { d: ["M3.5 5h17v11h-17z", "M9 19.5h6M12 16v3.5", "M7 9.5l2 1.5-2 1.5M11 12.5h3"] },
+    Music:   { d: ["M9 17.5V6.2l10-2v11", circ(6.6, 17.5, 2.4), circ(16.6, 15.2, 2.4)] }
+  };
+  const iconSVG = name => {
+    const ic = CORE_ICONS[name]; if (!ic) return "";
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${ic.d.map(d => `<path d="${d}"/>`).join("")}${(ic.fill || []).map(d => `<path d="${d}" fill="currentColor" stroke="none"/>`).join("")}</svg>`;
+  };
+
   function buildFallbackSats() {
     const box = $("[data-core-sats]"); if (!box) return;
     const sats = C.coreSatellites || [];
     box.innerHTML = sats.map((s, i) => {
-      const a = (i / sats.length) * Math.PI * 2 - Math.PI / 2, rad = 46;
-      return `<div class="core__sat" style="left:${50 + Math.cos(a) * rad}%;top:${50 + Math.sin(a) * rad}%"><span>${esc(s)}</span></div>`;
+      const a = (i / sats.length) * Math.PI * 2 - Math.PI / 2, rad = 40;
+      return `<div class="core__sat" style="left:${50 + Math.cos(a) * rad}%;top:${50 + Math.sin(a) * rad}%"><span title="${esc(s)}">${iconSVG(s)}</span></div>`;
     }).join("");
+  }
+
+  /* Draw an icon badge to a canvas → texture for a Three.js sprite */
+  function iconTexture(THREE, name) {
+    const S = 256, c = document.createElement("canvas"); c.width = c.height = S;
+    const g = c.getContext("2d"), r = S / 2 - 10;
+    const bg = g.createRadialGradient(S * .38, S * .3, 10, S / 2, S / 2, r);
+    bg.addColorStop(0, "rgba(58,62,70,.92)"); bg.addColorStop(.7, "rgba(16,18,22,.92)"); bg.addColorStop(1, "rgba(8,9,11,.92)");
+    g.beginPath(); g.arc(S / 2, S / 2, r, 0, Math.PI * 2); g.fillStyle = bg; g.fill();
+    const rim = g.createLinearGradient(0, 0, S, S); rim.addColorStop(0, "rgba(255,255,255,.75)"); rim.addColorStop(.5, "rgba(255,255,255,.12)"); rim.addColorStop(1, "rgba(255,143,63,.8)");
+    g.lineWidth = 5; g.strokeStyle = rim; g.stroke();
+    const ic = CORE_ICONS[name];
+    if (ic) {
+      g.save(); const k = 5.4; g.translate(S / 2 - 12 * k, S / 2 - 12 * k); g.scale(k, k);
+      const ink = g.createLinearGradient(0, 3, 0, 21); ink.addColorStop(0, "#ffffff"); ink.addColorStop(.55, "#d6dae0"); ink.addColorStop(1, "#ffb27a");
+      g.strokeStyle = ink; g.fillStyle = ink; g.lineWidth = 1.55; g.lineCap = "round"; g.lineJoin = "round";
+      ic.d.forEach(d => g.stroke(new Path2D(d))); (ic.fill || []).forEach(d => g.fill(new Path2D(d)));
+      g.restore();
+    }
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
   }
 
   function webglOK() {
@@ -638,46 +674,35 @@
       fragmentShader: "uniform vec3 c; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - abs(dot(vN, vV)), 2.6); float hi = pow(max(dot(vN, normalize(vec3(-0.5,0.7,0.5))),0.0), 40.0); gl_FragColor = vec4(c * f * 0.85 + vec3(f*f*0.4 + hi*0.6), clamp(f + hi*0.6, 0.0, 1.0)); }"
     });
     root.add(new THREE.Mesh(shellGeo, rimMat));
-    // inner faceted metal core + glowing heart
-    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 1), new THREE.MeshStandardMaterial({ color: 0xc9d1da, metalness: 0.85, roughness: 0.3, flatShading: true, envMapIntensity: 1.6, emissive: 0x0d3a42, emissiveIntensity: 0.6 }));
-    root.add(core);
-    const heart = new THREE.Mesh(new THREE.SphereGeometry(0.16, 32, 32), new THREE.MeshBasicMaterial({ color: accent }));
-    root.add(heart);
-    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: radialTex(THREE), color: accent, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.55 }));
-    glow.scale.set(2.6, 2.6, 1); root.add(glow);
-
-    // orbit rings
-    const metal = new THREE.MeshStandardMaterial({ color: 0xdfe3e8, metalness: 1, roughness: 0.18 });
-    const rings = [[1.7, 0.01, 1.25, 0.2], [1.95, 0.005, -0.4, 0.9], [1.0, 0.007, 0.6, -0.6]].map(([r, t, rx, rz], i) => {
-      const m = new THREE.Mesh(new THREE.TorusGeometry(r, t, 12, 220), i === 1 ? new THREE.MeshBasicMaterial({ color: accent, transparent: true, opacity: .55 }) : metal);
-      m.rotation.set(rx, 0, rz); root.add(m); return m;
+    // centre: chrome camera lens with an amber iris
+    const metal = new THREE.MeshStandardMaterial({ color: 0xdfe3e8, metalness: 1, roughness: 0.2 });
+    const lens = new THREE.Group(); root.add(lens);
+    lens.add(new THREE.Mesh(new THREE.CircleGeometry(0.5, 64), new THREE.MeshStandardMaterial({ color: 0x08090b, metalness: 0.6, roughness: 0.15 })));
+    [[0.54, 0.055], [0.43, 0.022], [0.33, 0.016], [0.22, 0.01]].forEach(([r, tb], i) => {
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(r, tb, 16, 120), i === 0 ? metal : new THREE.MeshStandardMaterial({ color: i === 3 ? 0xff8f3f : 0x9aa1ab, metalness: 1, roughness: 0.3, emissive: i === 3 ? 0xff8f3f : 0x000000, emissiveIntensity: i === 3 ? 0.6 : 0 }));
+      ring.position.z = 0.01 + i * 0.006; lens.add(ring);
     });
+    const heart = new THREE.Mesh(new THREE.CircleGeometry(0.12, 48), new THREE.MeshBasicMaterial({ color: accent }));
+    heart.position.z = 0.04; lens.add(heart);
+    const spec = new THREE.Sprite(new THREE.SpriteMaterial({ map: radialTex(THREE), color: 0xffffff, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false }));
+    spec.scale.set(0.22, 0.22, 1); spec.position.set(-0.16, 0.18, 0.06); lens.add(spec);
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: radialTex(THREE), color: accent, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.5 }));
+    glow.scale.set(2.2, 2.2, 1); root.add(glow);
 
-    // satellites — miniature disciplines inside the core
+    // orbit rings (thin chrome)
+    const rings = [[1.7, 0.008, 1.25, 0.2], [1.95, 0.005, -0.4, 0.9]].map(([r, tb, rx, rz]) => {
+      const m = new THREE.Mesh(new THREE.TorusGeometry(r, tb, 12, 220), metal); m.rotation.set(rx, 0, rz); root.add(m); return m;
+    });
+    rings.push({ rotation: { x: 0, y: 0, z: 0 } });
+
+    // satellites — icon badges for each discipline, orbiting inside the globe
     const satNames = C.coreSatellites || [];
-    const satMat = new THREE.MeshStandardMaterial({ color: 0xf2f4f7, metalness: 0.9, roughness: 0.25 });
-    const satGeo = {
-      AI: new THREE.OctahedronGeometry(0.13),
-      Video: new THREE.BoxGeometry(0.24, 0.14, 0.05),
-      Social: new THREE.TorusGeometry(0.09, 0.03, 12, 32),
-      "3D": new THREE.BoxGeometry(0.16, 0.16, 0.16),
-      Camera: new THREE.CylinderGeometry(0.08, 0.1, 0.16, 24),
-      Digital: new THREE.PlaneGeometry(0.22, 0.16, 4, 3),
-      Music: new THREE.SphereGeometry(0.08, 20, 20)
-    };
-    const labels = document.createElement("div"); labels.className = "core-labels"; labels.setAttribute("aria-hidden", "true");
-    Object.assign(labels.style, { position: "absolute", inset: "0", pointerEvents: "none" });
-    $(".hero__stage").appendChild(labels);
     const sats = satNames.map((name, i) => {
-      const g = satGeo[name] || new THREE.IcosahedronGeometry(0.1);
-      const mat = name === "3D" ? new THREE.MeshBasicMaterial({ color: accent, wireframe: true }) : name === "Digital" ? new THREE.MeshBasicMaterial({ color: accent, wireframe: true, side: THREE.DoubleSide }) : satMat;
-      const m = new THREE.Mesh(g, mat);
-      const pivot = new THREE.Group(); pivot.rotation.set(Math.random() * Math.PI, (i / satNames.length) * Math.PI * 2, Math.random() * 0.6);
-      m.position.x = 0.72 + (i % 3) * 0.15; pivot.add(m); root.add(pivot);
-      const lab = document.createElement("span"); lab.textContent = name;
-      Object.assign(lab.style, { position: "absolute", left: "0", top: "0", fontFamily: "var(--f-mono)", fontSize: "10.5px", letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(243,244,246,.85)", padding: "5px 9px", borderRadius: "99px", border: "1px solid rgba(255,255,255,.14)", background: "rgba(8,10,13,.45)", backdropFilter: "blur(6px)", whiteSpace: "nowrap", willChange: "transform,opacity", transition: "opacity .4s" });
-      labels.appendChild(lab);
-      return { m, pivot, lab, speed: 0.12 + (i % 4) * 0.05, spin: 0.4 + Math.random() * 0.6 };
+      const mat = new THREE.SpriteMaterial({ map: iconTexture(THREE, name), transparent: true, depthWrite: false });
+      const m = new THREE.Sprite(mat); const sz = mobile ? 0.36 : 0.32; m.scale.set(sz, sz, 1);
+      const pivot = new THREE.Group(); pivot.rotation.set((i % 2 ? 0.5 : -0.4) + i * 0.12, (i / satNames.length) * Math.PI * 2, (i % 3 - 1) * 0.35);
+      m.position.x = 0.92 + (i % 3) * 0.12; pivot.add(m); root.add(pivot);
+      return { m, pivot, speed: 0.1 + (i % 4) * 0.035 };
     });
 
     // dust
@@ -717,18 +742,15 @@
       const s = baseS * (1 - scrollP * 0.18); root.scale.setScalar(s);
       root.rotation.y = t * 0.08 + mx * 0.5 + scrollP * 1.6;
       root.rotation.x = Math.sin(t * 0.3) * 0.08 + my * 0.3;
-      core.rotation.set(t * 0.3, t * 0.45, 0);
-      heart.scale.setScalar(1 + Math.sin(t * 2) * 0.08);
+      lens.lookAt(camera.position); lens.rotateZ(t * 0.15);
+      heart.scale.setScalar(1 + Math.sin(t * 2) * 0.1);
       glow.material.opacity = 0.45 + Math.sin(t * 2) * 0.1;
-      rings[0].rotation.z += 0.0018; rings[1].rotation.y += 0.001; rings[2].rotation.x -= 0.003;
+      rings[0].rotation.z += 0.0018; rings[1].rotation.y += 0.001;
       dust.rotation.y = -t * 0.02;
       sats.forEach(o => {
         o.pivot.rotation.y += o.speed * 0.01 * (1 + scrollP * 2);
-        o.m.rotation.x += 0.01 * o.spin; o.m.rotation.y += 0.013 * o.spin;
-        o.m.getWorldPosition(v); const depth = v.z; v.project(camera);
-        const x = (v.x * .5 + .5) * W, y = (-v.y * .5 + .5) * H;
-        o.lab.style.transform = `translate(${(x + 14).toFixed(1)}px, ${(y - 10).toFixed(1)}px)`;
-        o.lab.style.opacity = depth > -0.2 ? (1 - scrollP * 1.5).toFixed(2) : "0.18";
+        o.m.getWorldPosition(v);
+        o.m.material.opacity = (v.z > -0.3 ? 1 : 0.35) * (1 - scrollP * 1.2);
       });
       renderer.render(scene, camera);
     }

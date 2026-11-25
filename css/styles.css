@@ -198,7 +198,8 @@ p { margin: 0 0 1em; }
 .core__heart { inset: 38%; background: radial-gradient(circle at 35% 30%, #fff 0%, #ffd2ad 18%, var(--accent) 40%, rgba(255,143,63,.1) 72%, transparent 74%); filter: blur(.5px); box-shadow: 0 0 80px 10px var(--accent-glow); animation: breathe 5s ease-in-out infinite; }
 .core__sats { inset: 0; opacity: .8; animation: orbit 60s linear infinite; }
 .core__sat { position: absolute; left: 50%; top: 50%; width: 0; height: 0; }
-.core__sat span { position: absolute; transform: translate(-50%,-50%); padding: 7px 12px; border-radius: 999px; font-family: var(--f-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--text); white-space: nowrap; background: rgba(12,14,18,.55); border: 1px solid var(--line-2); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); animation: counter 60s linear infinite; }
+.core__sat span { position: absolute; transform: translate(-50%,-50%); width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; color: #f3f4f6; background: radial-gradient(circle at 35% 30%, rgba(70,74,82,.9), rgba(12,13,16,.92) 70%); border: 1px solid rgba(255,255,255,.28); box-shadow: 0 6px 20px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,143,63,.12); animation: counter 60s linear infinite; }
+.core__sat svg { width: 27px; height: 27px; }
 @keyframes orbit { to { transform: rotate(360deg); } }
 @keyframes counter { from { transform: translate(-50%,-50%) rotate(0); } to { transform: translate(-50%,-50%) rotate(-360deg); } }
 @keyframes spinA { to { transform: rotateX(72deg) rotateZ(360deg); } }
