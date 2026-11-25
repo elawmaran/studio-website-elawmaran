@@ -16,8 +16,7 @@ window.ELAW.site = {
   url: "https://studio.elawmaran.tech/",
 
   contact: {
-    /* TODO: replace with your real studio email */
-    email: "hello@elawstudios.com",
+    email: "elawmaran@zohomail.in",
     location: "India · Working worldwide",
     responseNote: "We usually reply within 1–2 business days."
   },

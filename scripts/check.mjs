@@ -21,7 +21,7 @@ const vimeoOK = u => /(vimeo\.com\/(?:video\/)?\d+|player\.vimeo\.com\/video\/\d
 console.log("\nELAW content check\n");
 console.log("Site config");
 if (!E.site?.contact?.email) err("contact.email is empty");
-else if (/elawstudios\.com$/.test(E.site.contact.email)) warn(`contact.email is still the placeholder (${E.site.contact.email})`);
+else if (/^hello@elawstudios\.com$/.test(E.site.contact.email)) warn(`contact.email is still the placeholder (${E.site.contact.email})`);
 (E.site.social || []).forEach(s => { if (!s.url) warn(`social link "${s.label}" is empty (hidden on site)`); });
 if (!E.site.form?.endpoint) warn("form.endpoint is empty → form uses the visitor's email app (mailto)");
 
