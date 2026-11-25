@@ -38,7 +38,7 @@
   }
   function vimeoEmbedURL(url, { autoplay = true, background = false } = {}) {
     const v = parseVimeo(url); if (!v) return "";
-    const q = new URLSearchParams({ autoplay: autoplay ? 1 : 0, title: 0, byline: 0, portrait: 0, dnt: 1, color: "ff8f3f" });
+    const q = new URLSearchParams({ autoplay: autoplay ? 1 : 0, title: 0, byline: 0, portrait: 0, dnt: 1, color: "d6b98c" });
     if (v.hash) q.set("h", v.hash);
     if (background) { q.set("background", 1); q.set("muted", 1); q.set("loop", 1); }
     return `https://player.vimeo.com/video/${v.id}?${q}`;
@@ -617,12 +617,12 @@
     const bg = g.createRadialGradient(S * .38, S * .3, 10, S / 2, S / 2, r);
     bg.addColorStop(0, "rgba(58,62,70,.92)"); bg.addColorStop(.7, "rgba(16,18,22,.92)"); bg.addColorStop(1, "rgba(8,9,11,.92)");
     g.beginPath(); g.arc(S / 2, S / 2, r, 0, Math.PI * 2); g.fillStyle = bg; g.fill();
-    const rim = g.createLinearGradient(0, 0, S, S); rim.addColorStop(0, "rgba(255,255,255,.75)"); rim.addColorStop(.5, "rgba(255,255,255,.12)"); rim.addColorStop(1, "rgba(255,143,63,.8)");
+    const rim = g.createLinearGradient(0, 0, S, S); rim.addColorStop(0, "rgba(255,255,255,.75)"); rim.addColorStop(.5, "rgba(255,255,255,.12)"); rim.addColorStop(1, "rgba(214,185,140,.8)");
     g.lineWidth = 5; g.strokeStyle = rim; g.stroke();
     const ic = CORE_ICONS[name];
     if (ic) {
       g.save(); const k = 5.4; g.translate(S / 2 - 12 * k, S / 2 - 12 * k); g.scale(k, k);
-      const ink = g.createLinearGradient(0, 3, 0, 21); ink.addColorStop(0, "#ffffff"); ink.addColorStop(.55, "#d6dae0"); ink.addColorStop(1, "#ffb27a");
+      const ink = g.createLinearGradient(0, 3, 0, 21); ink.addColorStop(0, "#ffffff"); ink.addColorStop(.55, "#d6dae0"); ink.addColorStop(1, "#e6cfa6");
       g.strokeStyle = ink; g.fillStyle = ink; g.lineWidth = 1.55; g.lineCap = "round"; g.lineJoin = "round";
       ic.d.forEach(d => g.stroke(new Path2D(d))); (ic.fill || []).forEach(d => g.fill(new Path2D(d)));
       g.restore();
@@ -656,20 +656,20 @@
     const box = new THREE.Mesh(new THREE.BoxGeometry(20, 20, 20), new THREE.MeshBasicMaterial({ color: 0x050608, side: THREE.BackSide }));
     envScene.add(box);
     const panel = (w, h, pos, col, int) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(col).multiplyScalar(int), side: THREE.DoubleSide })); m.position.set(...pos); m.lookAt(0, 0, 0); envScene.add(m); };
-    panel(10, 4, [0, 8, 2], 0xffffff, 4); panel(4, 9, [-9, 1, 3], 0xffffff, 2.2); panel(3, 8, [9, 0, -2], 0xff8f3f, 3); panel(12, 2, [0, -6, 6], 0xffffff, .8);
+    panel(10, 4, [0, 8, 2], 0xffffff, 4); panel(4, 9, [-9, 1, 3], 0xffffff, 2.2); panel(3, 8, [9, 0, -2], 0xd6b98c, 3); panel(12, 2, [0, -6, 6], 0xffffff, .8);
     const pmrem = new THREE.PMREMGenerator(renderer);
     scene.environment = pmrem.fromScene(envScene, 0.02).texture;
 
     const root = new THREE.Group(); scene.add(root);
-    const accent = new THREE.Color(0xff8f3f);
+    const accent = new THREE.Color(0xd6b98c);
 
     // glass shell
     // glass shell: thin clear-coat surface + fresnel rim (cheaper and cleaner than transmission)
     const shellGeo = new THREE.SphereGeometry(1.35, mobile ? 48 : 96, mobile ? 48 : 96);
-    const shell = new THREE.Mesh(shellGeo, new THREE.MeshBasicMaterial({ color: 0xff8f3f, transparent: true, opacity: 0.035, depthWrite: false }));
+    const shell = new THREE.Mesh(shellGeo, new THREE.MeshBasicMaterial({ color: 0xd6b98c, transparent: true, opacity: 0.035, depthWrite: false }));
     root.add(shell);
     const rimMat = new THREE.ShaderMaterial({
-      uniforms: { c: { value: new THREE.Color(0xff8f3f) } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      uniforms: { c: { value: new THREE.Color(0xd6b98c) } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
       vertexShader: "varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix*vec4(position,1.0); vN = normalize(normalMatrix*normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix*mv; }",
       fragmentShader: "uniform vec3 c; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - abs(dot(vN, vV)), 2.6); float hi = pow(max(dot(vN, normalize(vec3(-0.5,0.7,0.5))),0.0), 40.0); gl_FragColor = vec4(c * f * 0.85 + vec3(f*f*0.4 + hi*0.6), clamp(f + hi*0.6, 0.0, 1.0)); }"
     });
@@ -709,7 +709,7 @@
     const N = mobile ? 260 : 600, pos = new Float32Array(N * 3);
     for (let i = 0; i < N; i++) { const r = 2.4 + Math.random() * 3.5, t = Math.random() * Math.PI * 2, p = Math.acos(2 * Math.random() - 1); pos.set([r * Math.sin(p) * Math.cos(t), r * Math.cos(p) * .6, r * Math.sin(p) * Math.sin(t)], i * 3); }
     const dustG = new THREE.BufferGeometry(); dustG.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    const dust = new THREE.Points(dustG, new THREE.PointsMaterial({ size: 0.018, color: 0xf2dccb, transparent: true, opacity: .55, depthWrite: false }));
+    const dust = new THREE.Points(dustG, new THREE.PointsMaterial({ size: 0.018, color: 0xe8dfcf, transparent: true, opacity: .55, depthWrite: false }));
     root.add(dust);
 
     const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(3, 5, 4); scene.add(key);
