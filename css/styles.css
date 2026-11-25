@@ -612,3 +612,77 @@ p { margin: 0 0 1em; }
 .phone__soon { position: absolute; z-index: 3; left: 50%; top: 42%; transform: translate(-50%,-50%); display: flex; flex-direction: column; align-items: center; gap: 12px; font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.75); white-space: nowrap; }
 .phone__soon i { width: 54px; height: 54px; border-radius: 50%; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); position: relative; }
 .phone__soon i::before { content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-35%,-50%); border-left: 12px solid rgba(255,255,255,.85); border-top: 7px solid transparent; border-bottom: 7px solid transparent; }
+
+/* =====================================================================
+   12. LIGHT THEME — warm ivory + antique gold
+   Active when <html data-theme="light">. Remove the attribute for dark.
+   ===================================================================== */
+:root[data-theme="light"] {
+  --bg: #f4f0e8;  --bg-1: #ece6da;  --bg-2: #e4ddcf;
+  --surface: rgba(28,24,18,.035); --surface-2: rgba(28,24,18,.06);
+  --line: rgba(28,24,18,.10); --line-2: rgba(28,24,18,.18);
+  --text: #17150f; --text-2: #4b463d; --muted: #857d70;
+  --accent: #9a7444; --accent-ink: #fffaf3; --accent-glow: rgba(154,116,68,.22);
+  --metal: linear-gradient(180deg, #3b3022 0%, #8a6a40 55%, #b8955f 100%);
+  color-scheme: light;
+}
+[data-theme="light"] body::before { opacity: .06; mix-blend-mode: multiply; }
+[data-theme="light"] .btn--light { background: var(--text); color: var(--bg); border-color: var(--text); }
+[data-theme="light"] .btn--light:hover { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+[data-theme="light"] .btn--ghost { background: rgba(255,255,255,.45); }
+[data-theme="light"] .btn--ghost:hover { background: #fff; }
+[data-theme="light"] .btn--accent:hover { box-shadow: 0 12px 34px -10px rgba(154,116,68,.55); }
+[data-theme="light"] .dot { box-shadow: none; }
+[data-theme="light"] .nav.is-scrolled { background: rgba(244,240,232,.78); }
+[data-theme="light"] .mmenu { background: rgba(244,240,232,.97); }
+[data-theme="light"] .hero__veil { background:
+    radial-gradient(120% 80% at 70% 40%, transparent 35%, rgba(244,240,232,.5) 72%, var(--bg) 100%),
+    linear-gradient(180deg, transparent 0%, transparent 60%, var(--bg) 100%); }
+[data-theme="light"] .hero__title { color: var(--text); }
+/* tags stay dark glass on media, light glass on paper */
+[data-theme="light"] .tag { background: rgba(255,255,255,.7); color: var(--text-2); border-color: var(--line-2); }
+[data-theme="light"] .card__media .tag, [data-theme="light"] .phone .tag, [data-theme="light"] .tile .tag, [data-theme="light"] .v-media .tag { background: rgba(10,10,12,.55); color: #ece8e0; border-color: rgba(255,255,255,.18); }
+[data-theme="light"] .tag--exploration::before { background: var(--text-2); }
+[data-theme="light"] .card__media .tag--exploration::before { background: #e8e9ec; }
+[data-theme="light"] .card__media, [data-theme="light"] .tile { border-color: transparent; box-shadow: 0 30px 60px -38px rgba(40,30,15,.45); }
+[data-theme="light"] .story__words span { background: linear-gradient(180deg, #17150f 25%, #8a7f6e 120%); -webkit-background-clip: text; background-clip: text; }
+[data-theme="light"] .story__words span[data-last] { background: linear-gradient(180deg, #3b3022 0%, var(--accent) 110%); -webkit-background-clip: text; background-clip: text; }
+[data-theme="light"] .story__sticky::before { background: radial-gradient(60% 60% at 70% 50%, rgba(154,116,68,.08), transparent 70%); }
+[data-theme="light"] .story__progress i, [data-theme="light"] .timeline::after { box-shadow: none; }
+[data-theme="light"] .step.is-lit .step__node { box-shadow: 0 0 0 6px rgba(154,116,68,.08); }
+[data-theme="light"] .svc__row::before { background: linear-gradient(90deg, rgba(154,116,68,.07), transparent 70%); }
+[data-theme="light"] .reels__bg { background: radial-gradient(50% 50% at 50% 60%, rgba(154,116,68,.10), transparent 70%); }
+[data-theme="light"] .phone__frame { box-shadow: 0 50px 80px -40px rgba(40,30,15,.55), inset 0 0 0 1px rgba(255,255,255,.14); }
+[data-theme="light"] .room { background: radial-gradient(80% 90% at 40% 30%, #fbf8f2 0%, #ebe4d6 70%); }
+[data-theme="light"] .room__panel { background: rgba(255,255,255,.35); }
+[data-theme="light"] .room__floor::before { background: repeating-linear-gradient(90deg, rgba(28,24,18,.07) 0 1px, transparent 1px 48px), repeating-linear-gradient(0deg, rgba(28,24,18,.07) 0 1px, transparent 1px 48px); }
+[data-theme="light"] .room__activate-icon { background: radial-gradient(circle at 35% 30%, #fff, transparent 45%), radial-gradient(circle, rgba(154,116,68,.12), transparent 65%); }
+[data-theme="light"] .room__item[aria-selected="true"] { background: rgba(154,116,68,.08); }
+[data-theme="light"] .why__big small { -webkit-text-fill-color: var(--accent); }
+[data-theme="light"] .about__visual { box-shadow: 0 40px 80px -40px rgba(40,30,15,.5); border-color: transparent; }
+[data-theme="light"] .pills li { background: rgba(255,255,255,.5); }
+[data-theme="light"] .form { background: rgba(255,255,255,.55); box-shadow: 0 40px 80px -50px rgba(40,30,15,.35); }
+[data-theme="light"] .field input, [data-theme="light"] .field textarea, [data-theme="light"] .field select { background: rgba(255,255,255,.8); }
+[data-theme="light"] .field input:focus, [data-theme="light"] .field textarea:focus, [data-theme="light"] .field select:focus { background: #fff; box-shadow: 0 0 0 4px rgba(154,116,68,.14); }
+[data-theme="light"] .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234b463d' fill='none' stroke-width='1.5'/%3E%3C/svg%3E"); }
+[data-theme="light"] .field input::placeholder, [data-theme="light"] .field textarea::placeholder { color: #a49b8c; }
+[data-theme="light"] .chip input:checked + span { color: var(--accent-ink); }
+[data-theme="light"] .start__glow { background: radial-gradient(closest-side, rgba(154,116,68,.14), transparent); }
+[data-theme="light"] .footer__brand { background: linear-gradient(180deg, rgba(28,24,18,.14), rgba(28,24,18,0) 90%); -webkit-background-clip: text; background-clip: text; }
+[data-theme="light"] .viewer { background: var(--bg); }
+[data-theme="light"] .viewer::backdrop { background: rgba(30,26,20,.55); }
+[data-theme="light"] .viewer__close { background: rgba(255,255,255,.8); color: var(--text); }
+[data-theme="light"] .viewer__close:hover { background: var(--text); color: var(--bg); }
+/* the Eclipse logo stays a cinematic dark band */
+[data-theme="light"] .brand-reveal { background: #08080a; color: #f3f4f6; padding-top: clamp(60px, 8vw, 110px); }
+[data-theme="light"] .brand-reveal__line { color: #c9ccd2; }
+[data-theme="light"] .brand-reveal__line em { color: #f3f4f6; }
+/* CSS fallback core on paper */
+[data-theme="light"] .core__glow { background: radial-gradient(circle, rgba(154,116,68,.25) 0%, transparent 60%); }
+[data-theme="light"] .core__shell { background: radial-gradient(circle at 30% 24%, rgba(255,255,255,.95) 0%, rgba(255,255,255,.2) 22%, transparent 42%), radial-gradient(circle at 50% 50%, rgba(255,255,255,.25) 40%, rgba(230,222,206,.7) 72%, rgba(28,24,18,.12) 74%, transparent 76%); box-shadow: inset 0 0 0 1px rgba(28,24,18,.1), 0 40px 80px -40px rgba(40,30,15,.35); }
+[data-theme="light"] .core__ring { border-color: rgba(28,24,18,.16); }
+[data-theme="light"] .core__ring--a { border-color: rgba(154,116,68,.5); }
+/* header logo swap */
+.nav__logo--dark { display: none; }
+[data-theme="light"] .nav__logo--light { display: none; }
+[data-theme="light"] .nav__logo--dark { display: block; }
