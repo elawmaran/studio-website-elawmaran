@@ -605,7 +605,7 @@
     const box = $("[data-core-sats]"); if (!box) return;
     const sats = C.coreSatellites || [];
     box.innerHTML = sats.map((s, i) => {
-      const a = (i / sats.length) * Math.PI * 2 - Math.PI / 2, rad = 40;
+      const a = (i / sats.length) * Math.PI * 2 - Math.PI / 2, rad = 46;
       return `<div class="core__sat" style="left:${50 + Math.cos(a) * rad}%;top:${50 + Math.sin(a) * rad}%"><span title="${esc(s)}">${iconSVG(s)}</span></div>`;
     }).join("");
   }
@@ -674,35 +674,35 @@
       fragmentShader: "uniform vec3 c; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - abs(dot(vN, vV)), 2.6); float hi = pow(max(dot(vN, normalize(vec3(-0.5,0.7,0.5))),0.0), 40.0); gl_FragColor = vec4(c * f * 0.85 + vec3(f*f*0.4 + hi*0.6), clamp(f + hi*0.6, 0.0, 1.0)); }"
     });
     root.add(new THREE.Mesh(shellGeo, rimMat));
-    // centre: chrome camera lens with an amber iris
-    const metal = new THREE.MeshStandardMaterial({ color: 0xdfe3e8, metalness: 1, roughness: 0.2 });
-    const lens = new THREE.Group(); root.add(lens);
-    lens.add(new THREE.Mesh(new THREE.CircleGeometry(0.5, 64), new THREE.MeshStandardMaterial({ color: 0x08090b, metalness: 0.6, roughness: 0.15 })));
-    [[0.54, 0.055], [0.43, 0.022], [0.33, 0.016], [0.22, 0.01]].forEach(([r, tb], i) => {
-      const ring = new THREE.Mesh(new THREE.TorusGeometry(r, tb, 16, 120), i === 0 ? metal : new THREE.MeshStandardMaterial({ color: i === 3 ? 0xff8f3f : 0x9aa1ab, metalness: 1, roughness: 0.3, emissive: i === 3 ? 0xff8f3f : 0x000000, emissiveIntensity: i === 3 ? 0.6 : 0 }));
-      ring.position.z = 0.01 + i * 0.006; lens.add(ring);
-    });
-    const heart = new THREE.Mesh(new THREE.CircleGeometry(0.12, 48), new THREE.MeshBasicMaterial({ color: accent }));
-    heart.position.z = 0.04; lens.add(heart);
-    const spec = new THREE.Sprite(new THREE.SpriteMaterial({ map: radialTex(THREE), color: 0xffffff, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false }));
-    spec.scale.set(0.22, 0.22, 1); spec.position.set(-0.16, 0.18, 0.06); lens.add(spec);
-    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: radialTex(THREE), color: accent, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.5 }));
-    glow.scale.set(2.2, 2.2, 1); root.add(glow);
+    // inner faceted metal core + glowing heart
+    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 1), new THREE.MeshStandardMaterial({ color: 0xc9d1da, metalness: 0.85, roughness: 0.3, flatShading: true, envMapIntensity: 1.6, emissive: 0x0d3a42, emissiveIntensity: 0.6 }));
+    root.add(core);
+    const heart = new THREE.Mesh(new THREE.SphereGeometry(0.16, 32, 32), new THREE.MeshBasicMaterial({ color: accent }));
+    root.add(heart);
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: radialTex(THREE), color: accent, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.55 }));
+    glow.scale.set(2.6, 2.6, 1); root.add(glow);
 
-    // orbit rings (thin chrome)
-    const rings = [[1.7, 0.008, 1.25, 0.2], [1.95, 0.005, -0.4, 0.9]].map(([r, tb, rx, rz]) => {
-      const m = new THREE.Mesh(new THREE.TorusGeometry(r, tb, 12, 220), metal); m.rotation.set(rx, 0, rz); root.add(m); return m;
+    // orbit rings
+    const metal = new THREE.MeshStandardMaterial({ color: 0xdfe3e8, metalness: 1, roughness: 0.18 });
+    const rings = [[1.7, 0.01, 1.25, 0.2], [1.95, 0.005, -0.4, 0.9], [1.0, 0.007, 0.6, -0.6]].map(([r, t, rx, rz], i) => {
+      const m = new THREE.Mesh(new THREE.TorusGeometry(r, t, 12, 220), i === 1 ? new THREE.MeshBasicMaterial({ color: accent, transparent: true, opacity: .55 }) : metal);
+      m.rotation.set(rx, 0, rz); root.add(m); return m;
     });
-    rings.push({ rotation: { x: 0, y: 0, z: 0 } });
 
-    // satellites — icon badges for each discipline, orbiting inside the globe
+    // satellites — discipline icons (were simple shapes), same orbits + labels as before
     const satNames = C.coreSatellites || [];
+    const labels = document.createElement("div"); labels.className = "core-labels"; labels.setAttribute("aria-hidden", "true");
+    Object.assign(labels.style, { position: "absolute", inset: "0", pointerEvents: "none" });
+    $(".hero__stage").appendChild(labels);
     const sats = satNames.map((name, i) => {
-      const mat = new THREE.SpriteMaterial({ map: iconTexture(THREE, name), transparent: true, depthWrite: false });
-      const m = new THREE.Sprite(mat); const sz = mobile ? 0.36 : 0.32; m.scale.set(sz, sz, 1);
-      const pivot = new THREE.Group(); pivot.rotation.set((i % 2 ? 0.5 : -0.4) + i * 0.12, (i / satNames.length) * Math.PI * 2, (i % 3 - 1) * 0.35);
-      m.position.x = 0.92 + (i % 3) * 0.12; pivot.add(m); root.add(pivot);
-      return { m, pivot, speed: 0.1 + (i % 4) * 0.035 };
+      const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: iconTexture(THREE, name), transparent: true, depthWrite: false }));
+      m.scale.set(0.3, 0.3, 1);
+      const pivot = new THREE.Group(); pivot.rotation.set(Math.random() * Math.PI, (i / satNames.length) * Math.PI * 2, Math.random() * 0.6);
+      m.position.x = 0.72 + (i % 3) * 0.15; pivot.add(m); root.add(pivot);
+      const lab = document.createElement("span"); lab.textContent = name;
+      Object.assign(lab.style, { position: "absolute", left: "0", top: "0", fontFamily: "var(--f-mono)", fontSize: "10.5px", letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(243,244,246,.85)", padding: "5px 9px", borderRadius: "99px", border: "1px solid rgba(255,255,255,.14)", background: "rgba(8,10,13,.45)", backdropFilter: "blur(6px)", whiteSpace: "nowrap", willChange: "transform,opacity", transition: "opacity .4s" });
+      labels.appendChild(lab);
+      return { m, pivot, lab, speed: 0.12 + (i % 4) * 0.05, spin: 0.4 + Math.random() * 0.6 };
     });
 
     // dust
@@ -742,15 +742,20 @@
       const s = baseS * (1 - scrollP * 0.18); root.scale.setScalar(s);
       root.rotation.y = t * 0.08 + mx * 0.5 + scrollP * 1.6;
       root.rotation.x = Math.sin(t * 0.3) * 0.08 + my * 0.3;
-      lens.lookAt(camera.position); lens.rotateZ(t * 0.15);
-      heart.scale.setScalar(1 + Math.sin(t * 2) * 0.1);
+      core.rotation.set(t * 0.3, t * 0.45, 0);
+      heart.scale.setScalar(1 + Math.sin(t * 2) * 0.08);
       glow.material.opacity = 0.45 + Math.sin(t * 2) * 0.1;
-      rings[0].rotation.z += 0.0018; rings[1].rotation.y += 0.001;
+      rings[0].rotation.z += 0.0018; rings[1].rotation.y += 0.001; rings[2].rotation.x -= 0.003;
       dust.rotation.y = -t * 0.02;
       sats.forEach(o => {
         o.pivot.rotation.y += o.speed * 0.01 * (1 + scrollP * 2);
-        o.m.getWorldPosition(v);
-        o.m.material.opacity = (v.z > -0.3 ? 1 : 0.35) * (1 - scrollP * 1.2);
+        o.m.material.rotation = Math.sin(t * o.spin) * 0.25;
+        o.m.getWorldPosition(v); const depth = v.z;
+        o.m.material.opacity = depth > -0.2 ? 1 : 0.4;
+        v.project(camera);
+        const x = (v.x * .5 + .5) * W, y = (-v.y * .5 + .5) * H;
+        o.lab.style.transform = `translate(${(x + 22).toFixed(1)}px, ${(y - 10).toFixed(1)}px)`;
+        o.lab.style.opacity = depth > -0.2 ? (1 - scrollP * 1.5).toFixed(2) : "0.18";
       });
       renderer.render(scene, camera);
     }
