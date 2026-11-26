@@ -763,7 +763,7 @@
       const g = (MODELS[name] || MODELS["3D"])();
       const bb = new THREE.Box3().setFromObject(g), c = bb.getCenter(new THREE.Vector3()), sz = bb.getSize(new THREE.Vector3());
       g.children.forEach(ch => ch.position.sub(c));
-      const holder = new THREE.Group(); holder.add(g); holder.scale.setScalar((mobile ? .5 : .46) / Math.max(sz.x, sz.y, sz.z)); return holder;
+      const holder = new THREE.Group(); holder.add(g); holder.userData.base = (mobile ? .4 : .34) / Math.max(sz.x, sz.y, sz.z); holder.scale.setScalar(holder.userData.base); return holder;
     };
 
     // ── SOLAR SYSTEM: flat, tilted concentric orbits around the diamond sun
@@ -776,7 +776,7 @@
     Object.assign(labels.style, { position: "absolute", inset: "0", pointerEvents: "none" });
     $(".hero__stage").appendChild(labels);
     const sats = satNames.map((name, i) => {
-      const r = 0.66 + i * 0.2;
+      const r = 0.7 + i * 0.235;
       const pts = []; for (let k = 0; k <= 160; k++) pts.push(orbitPos(r, k / 160 * Math.PI * 2, new THREE.Vector3()));
       solar.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: i % 2 ? 0xffffff : accent, transparent: true, opacity: i % 2 ? .1 : .22 })));
       const icon = buildIcon(name); solar.add(icon);
@@ -785,12 +785,12 @@
       const lab = document.createElement("span"); lab.textContent = name;
       Object.assign(lab.style, { position: "absolute", left: "0", top: "0", fontFamily: "var(--f-mono)", fontSize: "10.5px", letterSpacing: ".14em", textTransform: "uppercase", color: LIGHT ? "rgba(23,21,15,.85)" : "rgba(243,244,246,.85)", padding: "5px 9px", borderRadius: "99px", border: LIGHT ? "1px solid rgba(28,24,18,.14)" : "1px solid rgba(255,255,255,.14)", background: LIGHT ? "rgba(255,255,255,.6)" : "rgba(8,10,13,.45)", backdropFilter: "blur(6px)", whiteSpace: "nowrap", willChange: "transform,opacity", transition: "opacity .4s" });
       labels.appendChild(lab);
-      return { icon, halo, lab, r, a: i * 2.4, w: 0.36 * Math.pow(0.66 / r, 1.5), spin: 0.5 + (i % 3) * 0.2 };
+      return { icon, halo, lab, r, a: i * (Math.PI * 2 / 7) * 3, w: 0.34 * Math.pow(0.7 / r, 1.5), spin: 0.5 + (i % 3) * 0.2 };
     });
 
     // dust
-    const N = mobile ? 260 : 600, pos = new Float32Array(N * 3);
-    for (let i = 0; i < N; i++) { const r = 2.4 + Math.random() * 3.5, t = Math.random() * Math.PI * 2, p = Math.acos(2 * Math.random() - 1); pos.set([r * Math.sin(p) * Math.cos(t), r * Math.cos(p) * .6, r * Math.sin(p) * Math.sin(t)], i * 3); }
+    const N = mobile ? 500 : 1400, pos = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) { const r = 2.6 + Math.random() * 6, t = Math.random() * Math.PI * 2, p = Math.acos(2 * Math.random() - 1); pos.set([r * Math.sin(p) * Math.cos(t), r * Math.cos(p) * .6, r * Math.sin(p) * Math.sin(t)], i * 3); }
     const dustG = new THREE.BufferGeometry(); dustG.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     const dust = new THREE.Points(dustG, new THREE.PointsMaterial({ size: 0.018, color: LIGHT ? 0x9a7444 : TW ? 0xe9dcff : 0xcfe9ee, transparent: true, opacity: LIGHT ? .35 : .55, depthWrite: false }));
     root.add(dust);
@@ -822,7 +822,7 @@
       W = hero.clientWidth; H = hero.clientHeight;
       renderer.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix();
       const wide = W / H > 1.05;
-      baseX = wide ? Math.min(2.9, camera.aspect * 1.45) : 0; baseY = wide ? 0.2 : 1.3; baseS = wide ? 0.95 : Math.min(0.72, camera.aspect * 0.85);
+      baseX = wide ? Math.min(2.55, camera.aspect * 1.3) : 0; baseY = wide ? 0.15 : 1.3; baseS = wide ? 0.86 : Math.min(0.62, camera.aspect * 0.74);
     };
     resize(); addEventListener("resize", resize);
 
@@ -898,10 +898,10 @@
         c.scale.setScalar(1 - scrollP * 0.3);
       });
       sats.forEach(o => {
-        o.a += (o.w * timeScale * (1 + scrollP * 1.5) + spinVel * (0.66 / o.r)) * dtF;
+        o.a += (o.w * timeScale * (1 + scrollP * 1.5) + spinVel * (0.7 / o.r)) * dtF;
         orbitPos(o.r, o.a, o.icon.position); o.halo.position.copy(o.icon.position);
         o.hover += ((o === hovered ? 1 : 0) - o.hover) * 0.12;
-        const sc = 1 + o.hover * 0.45; o.icon.scale.setScalar(sc);
+        o.icon.scale.setScalar(o.icon.userData.base * (1 + o.hover * 0.4));
         o.halo.material.opacity = 0.16 + o.hover * 0.45; o.halo.scale.setScalar(0.8 + o.hover * 0.5);
         o.icon.rotation.y = o === hovered ? o.icon.rotation.y + dtF * 2.4 : Math.sin(t * o.spin + o.r * 3) * 0.85;
         o.icon.rotation.x = Math.sin(t * .6 + o.r) * .15;
