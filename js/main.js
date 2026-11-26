@@ -820,7 +820,7 @@
       W = hero.clientWidth; H = hero.clientHeight;
       renderer.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix();
       const wide = W / H > 1.05;
-      baseX = wide ? Math.min(2.9, camera.aspect * 1.45) : 0.7; baseY = wide ? 0.2 : 1.35; baseS = wide ? 0.95 : 0.72;
+      baseX = wide ? Math.min(2.9, camera.aspect * 1.45) : 0; baseY = wide ? 0.2 : 1.3; baseS = wide ? 0.95 : Math.min(0.72, camera.aspect * 0.85);
     };
     resize(); addEventListener("resize", resize);
 
