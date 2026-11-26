@@ -854,7 +854,7 @@
       sats.forEach(o => {
         o.a += o.w * dtF * (1 + scrollP * 1.5);
         orbitPos(o.r, o.a, o.icon.position); o.halo.position.copy(o.icon.position);
-        o.icon.rotation.y = t * o.spin; o.icon.rotation.x = Math.sin(t * .6 + o.r) * .2;
+        o.icon.rotation.y = Math.sin(t * o.spin + o.r * 3) * 0.85; o.icon.rotation.x = Math.sin(t * .6 + o.r) * .15;
         const isFront = Math.sin(o.a) > -0.15;
         o.icon.getWorldPosition(v); v.project(camera);
         const x = (v.x * .5 + .5) * W, y = (-v.y * .5 + .5) * H;
