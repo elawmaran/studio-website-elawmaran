@@ -35,6 +35,55 @@
     };
     requestAnimationFrame(tick);
   }
+  /* ---------- hero cursor play: follow-spot, focus reticle, camera aims, click = shutter ---------- */
+  const reticle = $(".reticle"), rLbl = $(".reticle__lbl"), flash = $(".flash"), shotsEl = $("[data-shots]");
+  const camHead = $(".cam__head"), camG = $(".cam"), glint = $(".cam__glint");
+  if (!REDUCED && hero && reticle) {
+    const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
+    let px = innerWidth / 2, py = innerHeight * .45, rx = px, ry = py, sx = px, sy = py, inHero = false, lastMove = 0, locked = false, ang = 0, shots = 0, hideT;
+    const local = e => { const b = hero.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
+    const overUI = el => el && el.closest && el.closest(".hero__copy, .nav, a, button");
+    hero.addEventListener("pointermove", e => {
+      [px, py] = local(e); lastMove = performance.now();
+      const ui = overUI(e.target);
+      if (e.pointerType === "mouse") hero.classList.toggle("is-live", !ui);
+      if (locked) { locked = false; reticle.classList.remove("is-lock"); rLbl.textContent = "AF"; }
+    }, { passive: true });
+    hero.addEventListener("pointerleave", () => { hero.classList.remove("is-live"); });
+    hero.addEventListener("pointerdown", e => {
+      if (overUI(e.target)) return;
+      [px, py] = local(e); if (e.pointerType !== "mouse") { rx = px; ry = py; sx = px; sy = py; }
+      hero.classList.add("is-live");
+      shots++; if (shotsEl) shotsEl.textContent = "SHOT " + String(shots).padStart(3, "0");
+      flash.classList.remove("is-on"); void flash.offsetWidth; flash.classList.add("is-on");
+      hero.classList.remove("is-shot"); void hero.offsetWidth; hero.classList.add("is-shot", "has-shot");
+      reticle.classList.add("is-snap"); rLbl.textContent = "● SHOT " + String(shots).padStart(3, "0");
+      setTimeout(() => { reticle.classList.remove("is-snap"); rLbl.textContent = locked ? "AF · LOCK" : "AF"; }, 650);
+      if (e.pointerType !== "mouse") { clearTimeout(hideT); hideT = setTimeout(() => hero.classList.remove("is-live"), 1400); }
+    });
+    const aim = () => {
+      const now = performance.now();
+      rx += (px - rx) * .22; ry += (py - ry) * .22;
+      sx += (px - sx) * .08; sy += (py - sy) * .08;
+      reticle.style.transform = `translate3d(${rx.toFixed(1)}px, ${ry.toFixed(1)}px, 0)`;
+      hero.style.setProperty("--sx", sx.toFixed(0) + "px"); hero.style.setProperty("--sy", sy.toFixed(0) + "px");
+      if (!locked && fine && hero.classList.contains("is-live") && now - lastMove > 420) { locked = true; reticle.classList.add("is-lock"); rLbl.textContent = "AF · LOCK"; }
+      // camera head tilts toward the cursor (pivot = tripod head)
+      if (camHead && camG && scrollY < innerHeight) {
+        const m = camG.getScreenCTM(), hb = hero.getBoundingClientRect();
+        if (m) {
+          const pyScreen = m.b * 800 + m.d * 690 + m.f - hb.top;
+          const target = Math.max(-14, Math.min(14, -((py - pyScreen) / innerHeight) * 42));
+          ang += (target - ang) * .07;
+          camHead.setAttribute("transform", `rotate(${ang.toFixed(2)} 800 690)`);
+          glint.setAttribute("cx", (452 + mx * 14).toFixed(1)); glint.setAttribute("cy", (575 + my * 10).toFixed(1));
+        }
+      }
+      requestAnimationFrame(aim);
+    };
+    requestAnimationFrame(aim);
+  }
+
   // live timecode in the viewfinder
   const tc = $("[data-timecode]"), t0 = performance.now();
   const pad = n => String(n).padStart(2, "0");
@@ -149,4 +198,48 @@
   $$("[data-year]").forEach(s => s.textContent = new Date().getFullYear());
   $("[data-social]").innerHTML = [email ? `<a href="mailto:${esc(email)}">${esc(email)}</a>` : "", ...(SITE.social || []).filter(s => s.url).map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a>`)].join("");
   scrollFns.forEach(f => f());
+
+  /* ---------- call sheet enquiry form ---------- */
+  (() => {
+    const form = $("#inquiry"); if (!form) return;
+    const cfg = SITE.form || {}, email = SITE.contact?.email || "";
+    const td = $("[data-today]"); if (td) td.textContent = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short" }).toUpperCase();
+    $("[data-form-types]").innerHTML = (cfg.projectTypes || []).map(t => `<label class="chip"><input type="checkbox" name="projectType" value="${esc(t)}"><span>${esc(t)}</span></label>`).join("");
+    $("[data-form-timelines]").insertAdjacentHTML("beforeend", (cfg.timelines || []).map(t => `<option>${esc(t)}</option>`).join(""));
+    $("[data-form-budgets]").insertAdjacentHTML("beforeend", (cfg.budgets || []).map(t => `<option>${esc(t)}</option>`).join(""));
+    $("[data-form-note]").textContent = `Every project is quoted individually. ${SITE.contact?.responseNote || ""}`;
+    const status = $("[data-form-status]"), fieldOf = el => el.closest(".f");
+    const setErr = (f, msg) => { f.classList.toggle("is-invalid", !!msg); let e = $(".err", f); if (msg) { if (!e) { e = document.createElement("span"); e.className = "err"; f.appendChild(e); } e.textContent = msg; } else if (e) e.remove(); };
+    const validate = () => {
+      let ok = true, first = null; const fail = (el, msg) => { setErr(fieldOf(el), msg); if (ok) first = el; ok = false; };
+      const { name, email: em, description: desc } = form.elements;
+      [name, em, desc].forEach(el => setErr(fieldOf(el), ""));
+      setErr($("[data-form-types]").closest(".f"), "");
+      if (!name.value.trim()) fail(name, "Please tell us your name.");
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em.value.trim())) fail(em, "Please enter a valid email.");
+      if (!$$("input[name=projectType]:checked", form).length) fail($("input[name=projectType]", form), "Choose at least one.");
+      if (desc.value.trim().length < 10) fail(desc, "A sentence or two about the project helps us reply properly.");
+      if (first) first.focus(); return ok;
+    };
+    form.addEventListener("input", e => { const f = fieldOf(e.target); if (f && f.classList.contains("is-invalid")) setErr(f, ""); });
+    form.addEventListener("submit", async e => {
+      e.preventDefault(); status.className = "sheet__status f--full"; status.textContent = "";
+      if (form.elements.website_hp.value) return;
+      if (!validate()) { status.classList.add("is-err"); status.textContent = "Please check the highlighted fields."; return; }
+      const fd = new FormData(form);
+      const data = { name: fd.get("name"), company: fd.get("company"), email: fd.get("email"), country: fd.get("country"), projectType: fd.getAll("projectType").join(", "), description: fd.get("description"), timeline: fd.get("timeline"), budget: fd.get("budget"), reference: fd.get("reference"), source: location.href };
+      const btnTxt = $("button[type=submit] span", form);
+      if (cfg.endpoint) {
+        btnTxt.textContent = "Sending…";
+        try { const r = await fetch(cfg.endpoint, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(data) }); if (!r.ok) throw 0;
+          status.classList.add("is-ok"); status.textContent = `That's a wrap, ${String(data.name).split(" ")[0]} — your request is with us. ${SITE.contact?.responseNote || ""}`; form.reset();
+        } catch { status.classList.add("is-err"); status.innerHTML = `Something went wrong. Please email us at <a href="mailto:${esc(email)}">${esc(email)}</a>.`; }
+        finally { btnTxt.textContent = "Request a proposal"; }
+      } else {
+        const body = Object.entries({ Name: data.name, Company: data.company, Email: data.email, Country: data.country, "Project type": data.projectType, Timeline: data.timeline, "Budget range": data.budget, "Reference / website": data.reference, "Project description": data.description }).filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`).join("\n");
+        location.href = `mailto:${email}?subject=${encodeURIComponent(`Project inquiry — ${data.company || data.name}`)}&body=${encodeURIComponent(body)}`;
+        status.classList.add("is-ok"); status.textContent = `Your email app should open with your request ready to send. If it didn't, email us at ${email}.`;
+      }
+    });
+  })();
 })();
