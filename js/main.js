@@ -679,10 +679,12 @@
   async function initCore() {
     buildFallbackSats();
     const hero = $(".hero"), canvas = $("#core-canvas");
-    if (REDUCED || !webglOK() || (navigator.connection && navigator.connection.saveData)) return;
+    const useFallback = () => hero.classList.add("no-webgl");
+    if (REDUCED || !webglOK() || (navigator.connection && navigator.connection.saveData)) { useFallback(); return; }
+    const slow = setTimeout(useFallback, 7000); // show the CSS orb only if 3D is very slow
     let THREE;
     try { THREE = await import("https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js"); }
-    catch { return; } // CSS core stays
+    catch { useFallback(); return; } // CSS core stays
 
     const mobile = matchMedia("(max-width: 760px)").matches;
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: !mobile, alpha: true, powerPreference: "high-performance" });
@@ -824,27 +826,71 @@
     };
     resize(); addEventListener("resize", resize);
 
-    // interaction
+    // interaction ─ parallax, hover a planet, click to jump, drag to spin
     let mx = 0, my = 0, tx = 0, ty = 0, scrollP = 0, visible = true, raf = 0;
-    addEventListener("pointermove", e => { tx = (e.clientX / innerWidth - .5); ty = (e.clientY / innerHeight - .5); }, { passive: true });
+    const ndc = new THREE.Vector2(-9, -9), ray = new THREE.Raycaster();
+    let hovered = null, timeScale = 1, spinVel = 0, tiltX = 0, tiltTarget = 0, dragging = false, dragX = 0, dragY = 0, dragMoved = 0, sunBoost = 0;
+    const GOTO = { Camera: "#svc-video", Video: "#svc-video", Music: "#svc-video", Social: "#svc-social", AI: "#svc-ai", "3D": "#showroom", Digital: "#svc-digital" };
+    const setPointer = e => {
+      const r = hero.getBoundingClientRect();
+      ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+      tx = (e.clientX / innerWidth - .5); ty = (e.clientY / innerHeight - .5);
+    };
+    addEventListener("pointermove", e => {
+      setPointer(e);
+      if (dragging) {
+        const dx = e.clientX - dragX, dy = e.clientY - dragY; dragX = e.clientX; dragY = e.clientY; dragMoved += Math.abs(dx) + Math.abs(dy);
+        spinVel += dx * 0.012; tiltTarget = Math.max(-0.45, Math.min(0.55, tiltTarget + dy * 0.004));
+      }
+    }, { passive: true });
+    const onUI = e => e.target.closest("a, button, input, textarea, select, .nav, .hero__content .btn");
+    hero.addEventListener("pointerdown", e => {
+      if (onUI(e) || e.button !== 0) return;
+      setPointer(e); dragMoved = 0;
+      if (e.pointerType === "mouse") { dragging = true; dragX = e.clientX; dragY = e.clientY; hero.classList.add("is-grabbing"); }
+    });
+    addEventListener("pointerup", e => {
+      const wasDrag = dragging && dragMoved > 6; dragging = false; hero.classList.remove("is-grabbing");
+      if (wasDrag || !hovered || (e.target && e.target.closest && onUI(e))) return;
+      const target = $(GOTO[hovered.name] || "#services"); if (target) target.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth" });
+    });
+    hero.addEventListener("pointerleave", () => { ndc.set(-9, -9); });
     onScroll(() => { scrollP = Math.min(1, Math.max(0, scrollY / (hero.offsetHeight || 1))); });
     new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible && !raf) loop(); }).observe(hero);
     document.addEventListener("visibilitychange", () => { if (!document.hidden && visible && !raf) loop(); });
+    sats.forEach((o, i) => { o.name = satNames[i]; o.hover = 0; o.icon.traverse(ch => { ch.userData.sat = o; }); });
+    const hint = document.createElement("div"); hint.className = "core-hint"; hint.textContent = "Drag to spin · Click a planet";
+    $(".hero__stage").appendChild(hint);
 
-    const clock = new THREE.Clock(), v = new THREE.Vector3();
+    const clock = new THREE.Clock(), v = new THREE.Vector3(), sunV = new THREE.Vector3();
     function loop() {
       if (!visible || document.hidden) { raf = 0; return; }
       raf = requestAnimationFrame(loop);
       const dtF = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
-      mx += (tx - mx) * 0.04; my += (ty - my) * 0.04;
-      root.position.set(baseX - mx * 0.25, baseY + my * 0.2 + scrollP * 1.6, 0);
+      mx += (tx - mx) * 0.05; my += (ty - my) * 0.05;
+      root.position.set(baseX - mx * 0.3, baseY + my * 0.2 + scrollP * 1.6, 0);
       const s = baseS * (1 - scrollP * 0.18); root.scale.setScalar(s);
-      root.rotation.y = mx * 0.35;
-      root.rotation.x = Math.sin(t * 0.3) * 0.03 + my * 0.2;
-      core.rotation.set(t * 0.3, t * 0.45, 0);
-      heart.scale.setScalar(1 + Math.sin(t * 2) * 0.08);
-      glow.material.opacity = 0.45 + Math.sin(t * 2) * 0.1;
-      dust.rotation.y = -t * 0.02;
+      root.rotation.y = mx * 0.45;
+      if (!dragging) tiltTarget += (my * 0.35 - tiltTarget) * 0.03;          // cursor gently tips the orbital plane
+      tiltX += (tiltTarget - tiltX) * 0.08; solar.rotation.x = tiltX; root.rotation.x = Math.sin(t * 0.3) * 0.03;
+
+      // hover: which planet is under the cursor?
+      ray.setFromCamera(ndc, camera);
+      const hit = ndc.x > -2 ? ray.intersectObjects(sats.map(o => o.icon), true)[0] : null;
+      const h = hit ? hit.object.userData.sat : null;
+      if (h !== hovered) { if (hovered) hovered.lab.classList.remove("is-hot"); hovered = h; if (h) h.lab.classList.add("is-hot"); hero.classList.toggle("is-pointing", !!h); }
+      timeScale += ((hovered ? 0.15 : 1) - timeScale) * 0.06;
+      spinVel *= 0.94;
+
+      // the sun reacts to the cursor coming close
+      core.getWorldPosition(sunV); sunV.project(camera);
+      const dSun = Math.hypot(ndc.x - sunV.x, (ndc.y - sunV.y) * (H / W));
+      sunBoost += ((dSun < 0.18 ? 1 : 0) - sunBoost) * 0.06;
+      core.rotation.set(t * 0.3, t * (0.45 + sunBoost * 2.2), 0);
+      heart.scale.setScalar(1 + Math.sin(t * 2) * 0.08 + sunBoost * 0.45);
+      glow.material.opacity = 0.42 + Math.sin(t * 2) * 0.08 + sunBoost * 0.35;
+      glow.scale.setScalar(1.7 + sunBoost * 0.9);
+      dust.rotation.y = -t * 0.02 - spinVel * 0.02;
       cubes.forEach(c => {
         const u = c.userData;
         c.position.set(root.position.x + u.base.x * s, root.position.y + u.base.y * s + Math.sin(t * u.sp + u.ph) * 0.12, u.base.z);
@@ -852,18 +898,23 @@
         c.scale.setScalar(1 - scrollP * 0.3);
       });
       sats.forEach(o => {
-        o.a += o.w * dtF * (1 + scrollP * 1.5);
+        o.a += (o.w * timeScale * (1 + scrollP * 1.5) + spinVel * (0.66 / o.r)) * dtF;
         orbitPos(o.r, o.a, o.icon.position); o.halo.position.copy(o.icon.position);
-        o.icon.rotation.y = Math.sin(t * o.spin + o.r * 3) * 0.85; o.icon.rotation.x = Math.sin(t * .6 + o.r) * .15;
+        o.hover += ((o === hovered ? 1 : 0) - o.hover) * 0.12;
+        const sc = 1 + o.hover * 0.45; o.icon.scale.setScalar(sc);
+        o.halo.material.opacity = 0.16 + o.hover * 0.45; o.halo.scale.setScalar(0.8 + o.hover * 0.5);
+        o.icon.rotation.y = o === hovered ? o.icon.rotation.y + dtF * 2.4 : Math.sin(t * o.spin + o.r * 3) * 0.85;
+        o.icon.rotation.x = Math.sin(t * .6 + o.r) * .15;
         const isFront = Math.sin(o.a) > -0.15;
         o.icon.getWorldPosition(v); v.project(camera);
         const x = (v.x * .5 + .5) * W, y = (-v.y * .5 + .5) * H;
-        o.lab.style.transform = `translate(${(x + 30).toFixed(1)}px, ${(y - 10).toFixed(1)}px)`;
-        o.lab.style.opacity = isFront ? (1 - scrollP * 1.5).toFixed(2) : "0.22";
+        o.lab.style.transform = `translate(${(x + 30 + o.hover * 14).toFixed(1)}px, ${(y - 10).toFixed(1)}px)`;
+        o.lab.style.opacity = (isFront || o.hover > .2 ? 1 : 0.22) * (1 - scrollP * 1.5);
       });
       renderer.render(scene, camera);
     }
     loop();
+    clearTimeout(slow); hero.classList.remove("no-webgl");
     hero.classList.add("has-webgl");
   }
 
@@ -885,7 +936,7 @@
     requestAnimationFrame(() => document.documentElement.classList.add("is-ready"));
     scrollFns.forEach(f => f());
     const start = () => initCore().catch(() => {});
-    "requestIdleCallback" in window ? requestIdleCallback(start, { timeout: 1200 }) : setTimeout(start, 300);
+    setTimeout(start, 0);
   }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", boot) : boot();
 
