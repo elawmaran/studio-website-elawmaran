@@ -708,17 +708,17 @@
     const accent = new THREE.Color(TW ? 0xb48cff : 0x8cf2ff);
 
     // ── SUN: faceted diamond core with a glowing heart
-    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 1), new THREE.MeshStandardMaterial({ color: 0xc9d1da, metalness: 0.85, roughness: 0.3, flatShading: true, envMapIntensity: 1.6, emissive: TW ? 0x2a1660 : 0x0d3a42, emissiveIntensity: 0.6 }));
+    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.32, 1), new THREE.MeshStandardMaterial({ color: 0xc9d1da, metalness: 0.85, roughness: 0.3, flatShading: true, envMapIntensity: 1.6, emissive: TW ? 0x2a1660 : 0x0d3a42, emissiveIntensity: 0.6 }));
     root.add(core);
-    const heart = new THREE.Mesh(new THREE.SphereGeometry(0.16, 32, 32), new THREE.MeshBasicMaterial({ color: accent }));
+    const heart = new THREE.Mesh(new THREE.SphereGeometry(0.12, 32, 32), new THREE.MeshBasicMaterial({ color: accent }));
     root.add(heart);
-    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: radialTex(THREE), color: accent, transparent: true, blending: LIGHT ? THREE.NormalBlending : THREE.AdditiveBlending, depthWrite: false, opacity: LIGHT ? 0.35 : 0.55 }));
-    glow.scale.set(2.6, 2.6, 1); root.add(glow);
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: radialTex(THREE), color: accent, transparent: true, blending: LIGHT ? THREE.NormalBlending : THREE.AdditiveBlending, depthWrite: false, opacity: LIGHT ? 0.35 : 0.4 }));
+    glow.scale.set(1.7, 1.7, 1); root.add(glow);
 
     // ── 3D ICON MODELS (chrome + graphite, cyan light accents)
-    const chrome = new THREE.MeshStandardMaterial({ color: 0xe9edf2, metalness: 1, roughness: 0.2, envMapIntensity: 1.5 });
-    const graphite = new THREE.MeshStandardMaterial({ color: 0x2a2f37, metalness: 0.75, roughness: 0.32, envMapIntensity: 1.3 });
-    const lit = new THREE.MeshStandardMaterial({ color: 0x06191d, emissive: accent, emissiveIntensity: 1.1, metalness: 0.2, roughness: 0.15 });
+    const chrome = new THREE.MeshStandardMaterial({ color: 0xf4f7fa, metalness: 0.95, roughness: 0.24, envMapIntensity: 2.6 });
+    const graphite = new THREE.MeshStandardMaterial({ color: 0x6b7480, metalness: 0.8, roughness: 0.3, envMapIntensity: 2.2 });
+    const lit = new THREE.MeshStandardMaterial({ color: 0x0b2a30, emissive: accent, emissiveIntensity: 1.6, metalness: 0.2, roughness: 0.15 });
     const M = (geo, mat, x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.set(rx, ry, rz); return m; };
     const ext = (shapes, depth = 0.2, bev = 0.05) => new THREE.ExtrudeGeometry(shapes, { depth, bevelEnabled: true, bevelThickness: bev, bevelSize: bev * .8, bevelSegments: 4, curveSegments: 28 });
     const PI2 = Math.PI / 2;
@@ -761,11 +761,11 @@
       const g = (MODELS[name] || MODELS["3D"])();
       const bb = new THREE.Box3().setFromObject(g), c = bb.getCenter(new THREE.Vector3()), sz = bb.getSize(new THREE.Vector3());
       g.children.forEach(ch => ch.position.sub(c));
-      const holder = new THREE.Group(); holder.add(g); holder.scale.setScalar((mobile ? .36 : .32) / Math.max(sz.x, sz.y, sz.z)); return holder;
+      const holder = new THREE.Group(); holder.add(g); holder.scale.setScalar((mobile ? .5 : .46) / Math.max(sz.x, sz.y, sz.z)); return holder;
     };
 
     // ── SOLAR SYSTEM: flat, tilted concentric orbits around the diamond sun
-    const TILT = 0.42;
+    const TILT = 0.5;
     const satNames = C.coreSatellites || [];
     const solar = new THREE.Group(); root.add(solar);
     const orbitPos = (r, a, out) => out.set(Math.cos(a) * r, -Math.sin(a) * r * Math.sin(TILT), Math.sin(a) * r * Math.cos(TILT));
@@ -774,16 +774,16 @@
     Object.assign(labels.style, { position: "absolute", inset: "0", pointerEvents: "none" });
     $(".hero__stage").appendChild(labels);
     const sats = satNames.map((name, i) => {
-      const r = 0.74 + i * 0.165;
+      const r = 0.66 + i * 0.2;
       const pts = []; for (let k = 0; k <= 160; k++) pts.push(orbitPos(r, k / 160 * Math.PI * 2, new THREE.Vector3()));
       solar.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: i % 2 ? 0xffffff : accent, transparent: true, opacity: i % 2 ? .1 : .22 })));
       const icon = buildIcon(name); solar.add(icon);
-      const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: radialTex(THREE), color: accent, transparent: true, opacity: .22, blending: LIGHT ? THREE.NormalBlending : THREE.AdditiveBlending, depthWrite: false }));
-      halo.scale.set(.55, .55, 1); solar.add(halo);
+      const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: radialTex(THREE), color: accent, transparent: true, opacity: .16, blending: LIGHT ? THREE.NormalBlending : THREE.AdditiveBlending, depthWrite: false }));
+      halo.scale.set(.8, .8, 1); solar.add(halo);
       const lab = document.createElement("span"); lab.textContent = name;
       Object.assign(lab.style, { position: "absolute", left: "0", top: "0", fontFamily: "var(--f-mono)", fontSize: "10.5px", letterSpacing: ".14em", textTransform: "uppercase", color: LIGHT ? "rgba(23,21,15,.85)" : "rgba(243,244,246,.85)", padding: "5px 9px", borderRadius: "99px", border: LIGHT ? "1px solid rgba(28,24,18,.14)" : "1px solid rgba(255,255,255,.14)", background: LIGHT ? "rgba(255,255,255,.6)" : "rgba(8,10,13,.45)", backdropFilter: "blur(6px)", whiteSpace: "nowrap", willChange: "transform,opacity", transition: "opacity .4s" });
       labels.appendChild(lab);
-      return { icon, halo, lab, r, a: i * 2.4, w: 0.42 * Math.pow(0.74 / r, 1.5), spin: 0.5 + (i % 3) * 0.2 };
+      return { icon, halo, lab, r, a: i * 2.4, w: 0.36 * Math.pow(0.66 / r, 1.5), spin: 0.5 + (i % 3) * 0.2 };
     });
 
     // dust
@@ -811,6 +811,8 @@
 
     const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(3, 5, 4); scene.add(key);
     const rim = new THREE.PointLight(accent, 6, 10); rim.position.set(-2.5, -1, 2); scene.add(rim);
+    const front = new THREE.DirectionalLight(0xffffff, 2.2); front.position.set(-1, 1.5, 6); scene.add(front);
+    scene.add(new THREE.HemisphereLight(0xdff6ff, 0x101318, 0.9));
 
     // layout
     let W = 0, H = 0, baseX = 0, baseY = 0, baseS = 1;
@@ -853,11 +855,11 @@
         o.a += o.w * dtF * (1 + scrollP * 1.5);
         orbitPos(o.r, o.a, o.icon.position); o.halo.position.copy(o.icon.position);
         o.icon.rotation.y = t * o.spin; o.icon.rotation.x = Math.sin(t * .6 + o.r) * .2;
-        const front = Math.sin(o.a) > -0.15;
+        const isFront = Math.sin(o.a) > -0.15;
         o.icon.getWorldPosition(v); v.project(camera);
         const x = (v.x * .5 + .5) * W, y = (-v.y * .5 + .5) * H;
-        o.lab.style.transform = `translate(${(x + 24).toFixed(1)}px, ${(y - 10).toFixed(1)}px)`;
-        o.lab.style.opacity = front ? (1 - scrollP * 1.5).toFixed(2) : "0.22";
+        o.lab.style.transform = `translate(${(x + 30).toFixed(1)}px, ${(y - 10).toFixed(1)}px)`;
+        o.lab.style.opacity = isFront ? (1 - scrollP * 1.5).toFixed(2) : "0.22";
       });
       renderer.render(scene, camera);
     }
